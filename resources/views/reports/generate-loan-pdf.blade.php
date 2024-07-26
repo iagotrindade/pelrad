@@ -121,7 +121,7 @@
                     MINISTÉRIO DA DEFESA<br>
                     EXÉRCITO BRASILEIRO<br>
                     COMANDO MILITAR DO SUL<br>
-                    3º BATALHÃO DE COMUNICAÇÕES E GUERRA ELETRÔNICA<br>
+                    {{$config->organization}}<br>
                     (3ª Cia Trns/ 3º BE/ 1917)<br>
                 </p>
             </div>
@@ -149,11 +149,13 @@
 
                                 <td>
                                     {{ $group['groupName'] }} 
-                                    (
-                                        @foreach ($group['groupComponents'] as $component)
-                                            {{ $component->name }}
-                                        @endforeach
-                                    )
+                                    @if ($group['groupComponents']->isNotEmpty())
+                                        (
+                                            @foreach ($group['groupComponents'] as $component)
+                                                {{ $component->name }}
+                                            @endforeach
+                                        )
+                                    @endif
                                 </td>
 
                                 <td>{{ $group['qtd'] }}</td>

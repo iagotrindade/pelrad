@@ -6,15 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Material extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'images',
         'name',
-        'type_id',
+        'categories_id',
         'description',
         'status',
         'serial_number',
@@ -32,11 +35,43 @@ class Material extends Model
 
     public function type(): BelongsTo
     {
-        return $this->belongsTo(Type::class);
+        return $this->belongsTo(Category::class, 'categories_id', 'id');
     }
 
-    public function components(): HasMany
+    public function getActivitylogOptions(): LogOptions
     {
-        return $this->hasMany(Component::class);
+        return LogOptions::defaults()
+        ->logOnly([
+            'name', 
+            'description',
+            'status',
+            'serial_number',
+            'inclusion_date',
+            'record_number',
+            'patrimony_number',
+            'patrimony_value',
+            'inclusion_document',
+        ])
+        ->logOnlyDirty()    
+        ->setDescriptionForEvent(function(string $eventName) {
+            switch ($eventName) {
+                case 'created':
+                    $eventName = 'Este material foi criado';
+                    break;
+    
+                case 'updated':
+                        $eventName = 'Este material foi alterado';
+                        break;
+
+                case 'restored':
+                    $eventName = 'Este material foi restaurado';
+                    break;
+    
+                case 'deleted':
+                    $eventName = 'Este material foi deletado';
+                    break;
+            }
+            return $eventName;
+        });
     }
 }

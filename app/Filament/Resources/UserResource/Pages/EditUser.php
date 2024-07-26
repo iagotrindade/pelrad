@@ -25,6 +25,8 @@ class EditUser extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        $record->update($data);
+
         Notification::make()
             ->title('Usuário modificado')
             ->icon('heroicon-o-user-group')

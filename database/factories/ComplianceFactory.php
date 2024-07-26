@@ -17,7 +17,7 @@ class ComplianceFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'name' => 'Pronto - 09 JUL 2024',
             'file' => fake()->url(),
         ];
     }

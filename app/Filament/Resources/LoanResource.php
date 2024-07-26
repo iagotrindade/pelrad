@@ -25,6 +25,9 @@ use Filament\Forms\Components\Wizard\Step;
 use App\Filament\Resources\LoanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LoanResource\RelationManagers;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\RestoreBulkAction;
 
 class LoanResource extends Resource
 {
@@ -35,6 +38,10 @@ class LoanResource extends Resource
     protected static ?string $navigationLabel = 'Cautelas';
 
     protected static ?string $modelLabel = 'Cautelas';
+
+    protected static ?string $recordTitleAttribute = 'to';
+
+    protected static ?int $navigationSort = 1;
 
     public $selectedMaterial = [];
 
@@ -64,10 +71,12 @@ class LoanResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Criado em:')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Atualizado em:')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -80,12 +89,6 @@ class LoanResource extends Resource
             ])
 
             ->filters([
-                SelectFilter::make('status')
-                ->options([
-                    'Aberta' => 'Aberta',
-                    'Fechada' => 'Fechada',
-                ]),
-
                 Filter::make('data')
                     ->form([
                         DatePicker::make('Data'),
@@ -96,17 +99,32 @@ class LoanResource extends Resource
                                 $data['Data'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
                             );
-                })
-            ], layout: FiltersLayout::AboveContent)
+                }),
+
+                Tables\Filters\TrashedFilter::make()
+            ])
 
             ->actions([
-                Tables\Actions\DeleteAction::make()->after(function ($record) {
+                ActivityLogTimelineAction::make('Logs'),
+                Tables\Actions\DeleteAction::make()->before(function ($record) {
                     $authUser = auth()->user();
                     $recipients = User::all();
 
                     $relativePath = str_replace('/storage', 'public', $record->file);
 
-                    //TORNAR TODOS OS EQUIPAMENTOS DISPONÍVEIS NOVAMENTE
+                    // Atualizar o status de cada material para 'Disponível'
+                    $materialsInfo = json_decode($record['materials_info'], true);
+
+                    // Verificar se a decodificação foi bem-sucedida e se materialsInfo é um array
+                    if (is_array($materialsInfo)) {
+                        // Atualizar o status de cada material para 'Cautelado'
+                        foreach ($materialsInfo as $material) {
+                            if (isset($material['id'])) {
+                                // Supondo que você tenha um modelo Material para atualizar o status
+                                Material::where('id', $material['id'])->update(['status' => 'Disponível']);
+                            }
+                        }
+                    }
 
                     if (Storage::exists($relativePath)) {
                         Storage::delete($relativePath);
@@ -118,12 +136,20 @@ class LoanResource extends Resource
                         ->body($authUser->name . ' deletou a cautela ' . $record->name . '.')
                     ->sendToDatabase($recipients);
                 }),
+
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make()
                 ]),
             ]);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['to', 'name', 'idt'];
     }
 
     public static function getRelations(): array

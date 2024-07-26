@@ -17,8 +17,8 @@ class Component extends Model
         'material_id',
     ];
 
-    public function material()
+    public function category()
     {
-        return $this->belongsTo(Material::class);
+        return $this->belongsTo(Category::class, 'id', 'categories_id');
     }
 }

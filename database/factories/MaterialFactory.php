@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,19 +17,17 @@ class MaterialFactory extends Factory
      */
     public function definition(): array
     {
-        switch (rand(1, 3)) {
+        switch (rand(1, 2)) {
             case 1: $status = 'Disponível';
             break;
 
             case 2: $status = 'Indisponível';
             break;
-
-            case 3: $status = 'Manutenção';
-            break;
         }
 
         return [
-            'images' => fake()->imageUrl(),
+            'images' => "",
+            'categories_id' => Category::inRandomOrder()->first()->id,
             'name' => fake()->name(),
             'serial_number' => fake()->name(),
             'description' => fake()->sentence(150),

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('serial_number');
             $table->text('description')->nullable();
             $table->string('status');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -35,14 +35,24 @@ class CreateLoan extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        
-
         $authUser = auth()->user();
         $recipients = User::all();
 
         $record = static::getModel()::create($data);
 
-        
+        // Atualizar o status de cada material para 'Cautelado'
+        $materialsInfo = json_decode($record['materials_info'], true);
+
+        // Verificar se a decodificação foi bem-sucedida e se materialsInfo é um array
+        if (is_array($materialsInfo)) {
+            // Atualizar o status de cada material para 'Cautelado'
+            foreach ($materialsInfo as $material) {
+                if (isset($material['id'])) {
+                    // Supondo que você tenha um modelo Material para atualizar o status
+                    Material::where('id', $material['id'])->update(['status' => 'Cautelado']);
+                }
+            }
+        }
 
         Notification::make()
             ->title('Nova cautela gerada')
@@ -85,8 +95,9 @@ class CreateLoan extends CreateRecord
                 }
             }
             $data['material_group'][$key] = $value;
-            $data['material_group'][$key]['groupName'] = $data['material_group'][0]['materials'][0]->name; 
-            $data['material_group'][$key]['groupComponents'] = $data['material_group'][0]['materials'][0]->components;
+
+            $data['material_group'][$key]['groupName'] = $data['material_group'][$key]['materials'][0]->type->name; 
+            $data['material_group'][$key]['groupComponents'] = $data['material_group'][$key]['materials'][0]->type->components;
         }
 
         // Converter o array de informações dos materiais para JSON e armazenar em material_info
@@ -96,8 +107,7 @@ class CreateLoan extends CreateRecord
         $data['status'] = 'Aberta';
         $data['file'] = '/storage/loans/Cautela '.$data['graduation'].' - '.$data['name'].' '.$data['to'].' '.Carbon::now()->format('d.m.Y H\hi').'.pdf';
 
-
-        Pdf::loadView('generate-loan-pdf', ['data' => $data, 'config' => Configuration::find(1)])->save(public_path().''.$data['file'].'')->stream('download.pdf');
+        Pdf::loadView('reports.generate-loan-pdf', ['data' => $data, 'config' => Configuration::find(1)])->save(public_path().''.$data['file'].'')->stream('download.pdf');
 
         return $data;
     }
@@ -119,18 +129,18 @@ class CreateLoan extends CreateRecord
                     ->label('Graduação')
                     ->live()
                     ->options([
-                        'sd' => 'Soldado',
-                        'cb' => 'Cabo',
-                        '3ºsgt' => '3º SGT',
-                        '2ºsgt' => '2º SGT',
-                        '1ºsgt' => '1º SGT',
-                        'sub' => 'Subtenente',
-                        '2ºten' => '2º Tenente',
-                        '1ºten' => '1º Tenente',
-                        'cap' => 'Capitão',
-                        'major' => 'Major',
-                        'tencel' => 'Tenente Coronel',
-                        'cel' => 'Coronel',
+                        'Sd' => 'Soldado',
+                        'Cb' => 'Cabo',
+                        '3º Sgt' => '3º SGT',
+                        '2º Sgt' => '2º SGT',
+                        '1º Sgt' => '1º SGT',
+                        'Sub' => 'Subtenente',
+                        '2º Ten' => '2º Tenente',
+                        '1º Ten' => '1º Tenente',
+                        'Cap' => 'Capitão',
+                        'Major' => 'Major',
+                        'Ten Cel' => 'Tenente Coronel',
+                        'Cel' => 'Coronel',
                     ]),
 
                     TextInput::make('name')

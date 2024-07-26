@@ -3,14 +3,14 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
-use App\Models\Type;
 use App\Models\User;
 use Filament\Tables;
+use App\Models\Category;
 use App\Models\Material;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Notifications\Actions\Action;
 use Filament\Resources\Resource;
+use Filament\Actions\RestoreAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Support\Enums\FontWeight;
@@ -19,14 +19,20 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\MaterialExporter;
+use Filament\Notifications\Actions\Action;
 use App\Filament\Resources\MaterialResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
 use App\Filament\Resources\MaterialResource\RelationManagers;
-
-
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Illuminate\Validation\ValidationException;
+use Filament\Resources\Components\Tab;
 
 class MaterialResource extends Resource
 {
@@ -37,6 +43,10 @@ class MaterialResource extends Resource
     protected static ?string $navigationLabel = 'Carga';
 
     protected static ?string $modelLabel = 'Materiais';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -58,9 +68,9 @@ class MaterialResource extends Resource
                             ->label('Nome')
                             ->required(),
 
-                        Select::make('type_id')
+                        Select::make('categories_id')
                             ->label('Categoria')
-                            ->options(Type::all()->pluck('name', 'id')),
+                            ->options(Category::all()->pluck('name', 'id')),
 
                         Forms\Components\TextInput::make('serial_number')
                             ->label('Nr de Serie')
@@ -93,42 +103,21 @@ class MaterialResource extends Resource
                                 'Manutenção' => 'Manutenção',
                                 'Descarregado' => 'Descarregado',
                             ])
+                            ->required()
+                            ->validationMessages([
+                                'status' => 'Não é possível alterar o :attribute por que ele está em manutenção ou cautelado.',
+                            ])
                     ])->columns(3),
-
-                    Forms\Components\Section::make()
-                        ->schema([
-                            Repeater::make('components')
-                                ->relationship('components') // Define o relacionamento
-                                ->schema([
-                                    Forms\Components\Hidden::make('id'), // Campo oculto para o ID do componente
-                                    Forms\Components\TextInput::make('name')
-                                        ->required()
-                                        ->label('Nome'),
-
-                                    Forms\Components\TextInput::make('serial_number')
-                                        ->label('Nr de Serie')
-                                        ->required(),
-
-                                    Forms\Components\TextInput::make('code_number')
-                                        ->required()
-                                        ->label('Código do Componente'),
-
-                                    Forms\Components\TextInput::make('quantity')
-                                        ->required()
-                                        ->numeric()
-                                        ->label('Quantidade'),
-                                ])
-                                ->columns(4)
-                                ->label('Componentes')
-                                ->collapsible()
-                               
-                        ])
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(MaterialExporter::class),
+            ])
             ->columns([
                 Tables\Columns\ImageColumn::make('images')
                 ->circular()
@@ -140,12 +129,8 @@ class MaterialResource extends Resource
 
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->label('Nome'),
-
-                Tables\Columns\TextColumn::make('description')
-                    ->searchable()
-                    ->limit(30)
-                    ->label('Descrição'),
+                    ->label('Nome')
+                    ->limit(30),
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -159,16 +144,6 @@ class MaterialResource extends Resource
             ])
 
             ->filters([
-                SelectFilter::make('status')
-                    ->multiple()
-                    ->options([
-                        'Disponível' => 'Disponível',
-                        'Indisponível' => 'Indisponível',
-                        'Cautelado' => 'Cautelado',
-                        'Manutenção' => 'Manutenção',
-                        'Descarregado' => 'Descarregado',
-                    ]),
-
                 Filter::make('data')
                     ->form([
                         DatePicker::make('Última atualização'),
@@ -191,15 +166,22 @@ class MaterialResource extends Resource
                                 $data['Inclusão em carga'],
                                 fn (Builder $query, $date): Builder => $query->where('inclusion_date', '>=', $date),
                             );
-                })
-            ], layout: FiltersLayout::AboveContent)
+                }),
+                
+                Tables\Filters\TrashedFilter::make()
+            ])
 
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                ActivityLogTimelineAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()->after(function ($record) {
+                Tables\Actions\DeleteAction::make()->before(function ($record) {
                     $authUser = auth()->user();
                     $recipients = User::all();
+
+                    if($record->components->isNotEmpty()) {
+                        return;
+                    }
 
                     Notification::make()
                         ->title('Material deletado')
@@ -207,12 +189,20 @@ class MaterialResource extends Resource
                         ->body($authUser->name . ' deletou o material ' . $record->name . '.')
                     ->sendToDatabase($recipients);
                 }),
+
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make()
                 ]),
             ]);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'serial_number'];
     }
 
     public static function getRelations(): array

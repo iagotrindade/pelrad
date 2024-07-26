@@ -8,8 +8,12 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\Layout\Split;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,6 +21,8 @@ use Filament\Notifications\Actions\Action;
 use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
+
 
 
 class UserResource extends Resource
@@ -29,33 +35,57 @@ class UserResource extends Resource
 
     protected static ?string $modelLabel = 'Usuários';
 
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static ?int $navigationSort = 7;
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Section::make()
                 ->schema([
-                    Forms\Components\FileUpload::make('avatar')
-                    ->avatar()
-                    ->imageEditor()
-                    ->imageEditorAspectRatios([
-                        '16:9',
-                        '4:3',
-                        '1:1',
-                    ])
-                    ->circleCropper(),
+                    FileUpload::make('avatar')
+                        ->imageEditor()
+                        ->imageEditorAspectRatios([
+                            '16:9',
+                            '4:3',
+                            '1:1',
+                        ])
+                        ->circleCropper(),
+                        ]),
+                Forms\Components\Section::make()
+                ->schema([
+                    Select::make('graduation')
+                    ->required()
+                    ->label('Graduação')
+                    ->live()
+                    ->options([
+                        'Sd' => 'Soldado',
+                        'Cb' => 'Cabo',
+                        '3º Sgt' => '3º SGT',
+                        '2º Sgt' => '2º SGT',
+                        '1º Sgt' => '1º SGT',
+                        'Sub' => 'Subtenente',
+                        '2º Ten' => '2º Tenente',
+                        '1º Ten' => '1º Tenente',
+                        'Cap' => 'Capitão',
+                        'Major' => 'Major',
+                        'Ten Cel' => 'Tenente Coronel',
+                        'Cel' => 'Coronel',
+                    ]),
                     
-                    Forms\Components\TextInput::make('name')
+                    TextInput::make('name')
                     ->required(),
 
-                    Forms\Components\TextInput::make('email')
+                    TextInput::make('email')
                         ->email()
                         ->required(),
 
-                    Forms\Components\TextInput::make('password')
+                    TextInput::make('password')
                         ->password()
                         ->required(),
-                ]),
+                ])->columns(2),
             ]);
     }
 
@@ -63,25 +93,39 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('avatar')
+                ImageColumn::make('avatar')
                     ->circular(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('graduation')
+                    ->searchable()
+                    ->sortable()
+                    ->label('Graduação'),
+                TextColumn::make('name')
                     ->searchable()
                     ->sortable()
                     ->label('Nome'),
 
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable()
                     ->sortable()
                     ->label('Email'),
+
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->label('Criado em')
+                    ->formatStateUsing(function ($state) {
+                        return \Carbon\Carbon::parse($state)->format('d M Y \à\s H:i');
+                    })
+                    ->searchable()
+                    ->sortable()
             ])
 
             ->filters([
-
+                
             ])
 
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ActivityLogTimelineAction::make('Logs'),
+
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->after(function ($record) {
                     $authUser = auth()->user();
@@ -93,6 +137,7 @@ class UserResource extends Resource
                         ->body($authUser->name . ' deletou o usuário ' . $record->name . '.')
                     ->sendToDatabase($recipients);
                 }),
+            
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -101,10 +146,15 @@ class UserResource extends Resource
             ]);
     }
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email'];
+    }
+
     public static function getRelations(): array
     {
         return [
-            //
+            
         ];
     }
 

@@ -9,6 +9,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Actions\Action;
 use App\Filament\Resources\MaterialResource;
+use Illuminate\Validation\ValidationException;
 
 class EditMaterial extends EditRecord
 {
@@ -26,7 +27,7 @@ class EditMaterial extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->after(function ($record) {
+            Actions\DeleteAction::make()->before(function ($record) {
                 Notification::make()
                     ->title('Material deletado')
                     ->icon('heroicon-o-cube') 
@@ -35,9 +36,18 @@ class EditMaterial extends EditRecord
             }),
         ];
     }
-
+    
     protected function handleRecordUpdate(Model $record, array $data): Model
     {   
+        if (
+            ($record->status == 'Cautelado' && $data['status'] != 'Cautelado') ||
+            ($record->status == 'Manutenção' && $data['status'] != 'Manutenção')
+        ) {
+            throw ValidationException::withMessages([
+                'status' => 'Não é possível atualizar o material com status "Cautelado" ou "Manutenção".',
+            ]);
+        }
+        
         $record->update($data);
 
         Notification::make()

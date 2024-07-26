@@ -2,21 +2,22 @@
 
 namespace App\Filament\Resources\ReportResource\Widgets;
 
+use App\Models\Category;
 use App\Models\Configuration;
 use App\Models\Loan;
-use App\Models\Type;
 use App\Models\User;
 use App\Models\Material;
+use App\Models\Activity;
 use Filament\Infolists\Components\Section;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Spatie\Activitylog\Models\Activity as ModelsActivity;
 
 class GeneralOverview extends BaseWidget
 {
     protected int | string | array $columnSpan = 'full';
     protected static ?string $pollingInterval = '10s';
 
-    
     protected function getStats(): array
     {
         return [
@@ -27,16 +28,16 @@ class GeneralOverview extends BaseWidget
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
-                    ->url('', shouldOpenInNewTab: true),
+                    ->url(route('report.users'), shouldOpenInNewTab: true),
 
-                Stat::make('Relatório de Categorias', Type::all()->count())
+                Stat::make('Relatório de Categorias', Category::all()->count())
                     ->descriptionIcon('heroicon-o-tag')
                     ->description('Dados das categorias')
                     ->color('success')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
-                    ->url('google.com', shouldOpenInNewTab: true),
+                    ->url(route('report.categories'), shouldOpenInNewTab: true),
                     
 
                 Stat::make('Relatório de Materiais', Material::all()->count())
@@ -46,7 +47,7 @@ class GeneralOverview extends BaseWidget
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
-                    ->url('', shouldOpenInNewTab: true),
+                    ->url(route('report.material'), shouldOpenInNewTab: true),
 
                 Stat::make('Relatório de Cautelas', Loan::all()->count())
                     ->descriptionIcon('heroicon-m-clipboard-document-list')
@@ -55,25 +56,25 @@ class GeneralOverview extends BaseWidget
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
-                    ->url('google.com', shouldOpenInNewTab: true),
+                    ->url(route('report.loans'), shouldOpenInNewTab: true),
 
                 Stat::make('Relatório de Configurações', Configuration::all()->count())
                     ->descriptionIcon('heroicon-o-cog-8-tooth')
-                    ->description('Dados da configuração de cautelas')
+                    ->description('Dado da configuração de cautelas')
                     ->color('success')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
-                    ->url('google.com', shouldOpenInNewTab: true),
+                    ->url(route('report.configuration'), shouldOpenInNewTab: true),
 
-                Stat::make('Relatório de Auditoria', '-')
+                Stat::make('Relatório de Auditoria', ModelsActivity::all()->count())
                     ->descriptionIcon('heroicon-m-eye')
                     ->description('Dados de auditoria')
                     ->color('success')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
-                    ->url('google.com', shouldOpenInNewTab: true),
+                    ->url(route('report.audit'), shouldOpenInNewTab: true),
         ];
     }
 }

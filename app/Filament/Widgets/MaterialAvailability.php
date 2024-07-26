@@ -9,6 +9,7 @@ use Carbon\Carbon;
 class MaterialAvailability extends ChartWidget
 {
     protected static ?string $heading = 'Materiais';
+    protected static ?string $maxHeight = '400px';
 
     protected static ?string $pollingInterval = '10s';
 

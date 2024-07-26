@@ -8,11 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Notifications\Notifiable;
-use Filament\Notifications\Notification;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -47,5 +48,36 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly([
+            'name',
+            'email',
+        ])
+        ->logOnlyDirty()
+        ->setDescriptionForEvent(function(string $eventName) {
+            switch ($eventName) {
+                case 'created':
+                    $eventName = 'Este usuário foi criado';
+                    break;
+    
+                case 'updated':
+                        $eventName = 'Este usuário foi atualizado';
+                        break;
+
+                case 'restored':
+                    $eventName = 'Este usuário foi restaurado';
+                    break;
+        
+    
+                case 'deleted':
+                    $eventName = 'Este usuário foi deletado';
+                    break;
+            }
+            return $eventName;
+        });
     }
 }

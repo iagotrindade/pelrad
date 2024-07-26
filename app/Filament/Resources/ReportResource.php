@@ -9,11 +9,14 @@ use Filament\Forms\Form;
 use App\Models\Compliance;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\Layout\Stack;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ReportResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ReportResource\RelationManagers;
-use Filament\Tables\Columns\Layout\Stack;
 
 class ReportResource extends Resource
 {
@@ -24,6 +27,8 @@ class ReportResource extends Resource
     protected static ?string $navigationLabel = 'Relatórios';
 
     protected static ?string $modelLabel = 'Relatórios';
+
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
@@ -36,32 +41,43 @@ class ReportResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Prontos do Pelotão')
+            ->headerActions([
+                Action::make('generate')
+                    ->label('Gerar Pronto')
+                    ->url(fn (): string => route('report.compliance'), shouldOpenInNewTab: true)
+            ])
             ->columns([
                 Stack::make([
                     Tables\Columns\TextColumn::make('name')
                     ->label('Nome')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Data')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('download')
                     ->label('PDF')
-                    ->searchable()
                     ->url(fn (Compliance $record): string => 'http://filament-app.test/'.$record->file.'')
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->openUrlInNewTab(),
-                ]),
-
+                ])
+            
                 
             ])->contentGrid([
-                'md' => 2,
-                'xl' => 3,
+                'md' => 3,
+                'xl' => 4,
             ])
             ->filters([
-                //
+                Filter::make('data')
+                    ->form([
+                        DatePicker::make('Data'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['Data'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
+                            );
+                }),
             ])
             ->actions([
                 
@@ -71,9 +87,7 @@ class ReportResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->emptyStateHeading('Nenhum pronto gerado')
-            ->emptyStateDescription('Quando for gerado o primeiro pronto, ele irá aparecer aqui.');
-            
+            ->emptyStateHeading('Nenhum pronto encontrado');
     }
 
     public static function getRelations(): array

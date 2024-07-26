@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('components', function (Blueprint $table) {
-            $table->foreignId('material_id')->constrained();
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('components', function (Blueprint $table) {
-            $table->dropForeign(['material_id']);
-        });
+        Schema::dropIfExists('categories');
     }
 };

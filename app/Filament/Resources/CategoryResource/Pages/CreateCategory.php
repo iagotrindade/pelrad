@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\MaterialTypeResource\Pages;
+namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Models\User;
 use Filament\Actions;
@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Notifications\Notification;
 use Filament\Notifications\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\MaterialTypeResource;
+use App\Filament\Resources\CategoryResource;
 
-class CreateMaterialType extends CreateRecord
+class CreateCategory extends CreateRecord
 {
-    protected static string $resource = MaterialTypeResource::class;
+    protected static string $resource = CategoryResource::class;
 
     protected function handleRecordCreation(array $data): Model
     {
@@ -28,7 +28,7 @@ class CreateMaterialType extends CreateRecord
             ->actions([
                 Action::make('Visualizar')
                     ->link()
-                    ->url(MaterialTypeResource::getUrl('edit', ['record' => $record]))
+                    ->url(CategoryResource::getUrl('edit', ['record' => $record]))
             ])
             ->sendToDatabase($recipients);
 

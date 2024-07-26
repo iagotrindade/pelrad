@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\MaterialTypeResource\Pages;
+namespace App\Filament\Resources\CategoryResource\Pages;
 
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Actions\Action;
-use App\Filament\Resources\MaterialTypeResource;
+use App\Filament\Resources\CategoryResource;
 use App\Models\User;
 
-class EditMaterialType extends EditRecord
+class EditCategory extends EditRecord
 {
-    protected static string $resource = MaterialTypeResource::class;
+    protected static string $resource = CategoryResource::class;
 
     public $authUser;
     public $recipients;
@@ -47,7 +47,7 @@ class EditMaterialType extends EditRecord
             ->actions([
                 Action::make('Visualizar')
                     ->link()
-                    ->url(MaterialTypeResource::getUrl('edit', ['record' => $record]))
+                    ->url(CategoryResource::getUrl('edit', ['record' => $record]))
             ])
             ->sendToDatabase($this->recipients);
 

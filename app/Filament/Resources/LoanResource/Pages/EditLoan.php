@@ -4,6 +4,7 @@ namespace App\Filament\Resources\LoanResource\Pages;
 
 use App\Models\User;
 use Filament\Actions;
+use App\Models\Material;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use App\Filament\Resources\LoanResource;
@@ -26,6 +27,21 @@ class EditLoan extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        // Atualizar o status de cada material para 'Disponível'
+        $materialsInfo = json_decode($record['materials_info'], true);
+
+        // Verificar se a decodificação foi bem-sucedida e se materialsInfo é um array
+        if (is_array($materialsInfo)) {
+            // Atualizar o status de cada material para 'Cautelado'
+            foreach ($materialsInfo as $material) {
+                if (isset($material['id'])) {
+                    // Supondo que você tenha um modelo Material para atualizar o status
+                    $newStatus = ($data['status'] == 'Fechada') ? 'Disponível' : 'Cautelado';
+                    Material::where('id', $material['id'])->update(['status' => $newStatus]);
+                }
+            }
+        }
+
         $record->update($data);
 
         Notification::make()

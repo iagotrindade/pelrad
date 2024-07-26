@@ -2,21 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ConfigurationResource\Pages;
-use App\Filament\Resources\ConfigurationResource\RelationManagers;
-use App\Models\Configuration;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Configuration;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
+use Filament\Forms\Components\Section;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Wizard\Step;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ConfigurationResource\Pages;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
+use App\Filament\Resources\ConfigurationResource\RelationManagers;
 
 class ConfigurationResource extends Resource
 {
@@ -28,7 +29,7 @@ class ConfigurationResource extends Resource
 
     protected static ?string $modelLabel = 'Configurações';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 8;
 
     public static function form(Form $form): Form
     {
@@ -100,6 +101,7 @@ class ConfigurationResource extends Resource
                 //
             ])
             ->actions([
+                ActivityLogTimelineAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

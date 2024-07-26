@@ -4,13 +4,15 @@ namespace Database\Seeders;
 
 use App\Models\Loan;
 use App\Models\User;
+use App\Models\Category;
 use App\Models\Material;
 use App\Models\Component;
-use App\Models\Compliance;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Compliance;
 use App\Models\Configuration;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Database\Factories\MaterialFactory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,14 +21,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(2)->create();
-        //Material::factory(25)->create();
-        //Component::factory(50)->create();
-
-        Compliance::factory(10)->create();
-
+        Category::factory(2)->create();
+        Material::factory(5)->create();
+        
         User::factory()->create([
             'avatar' => fake()->imageUrl(),
+            'graduation' => '3º Sgt',
             'name' => 'Iago Silva',
             'email' => 'iago23st1@gmail.com',
             'password' => Hash::make('12345678'),

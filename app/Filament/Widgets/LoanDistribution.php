@@ -9,6 +9,7 @@ use App\Models\Loan;
 class LoanDistribution extends ChartWidget
 {
     protected static ?string $heading = 'Cautelas';
+    protected static ?string $maxHeight = '400px';
 
     protected function getData(): array
     {
