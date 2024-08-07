@@ -11,6 +11,7 @@ use App\Models\Compliance;
 use Illuminate\Http\Request;
 use App\Models\Configuration;
 use App\Models\Loan;
+use App\Models\Maintenance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\Activitylog\Models\Activity;
 
@@ -18,8 +19,11 @@ class ReportController extends Controller
 {
     public function generateComplianceReport() {
         $compliances = Compliance::all();
+        $openLoans = Loan::where('status', 'Aberta')->get();
+        $maintenanceMaterials = Maintenance::where('status', 'Em andamento')->get();
+
         // Recupera todas as categorias com seus materiais
-        $categories = Category::with('materials')->get();
+        $categories = Category::with('materials')->where('show_compliance', 1)->get();
 
         // Itera sobre cada categoria
         foreach ($categories as $category) {
@@ -27,22 +31,63 @@ class ReportController extends Controller
             $category['material_count'] = $category->materials->count();
 
             // Filtra materiais que não têm o status 'Cautelado' ou 'Manutenção'
-            $filteredAvailableMaterials = $category->materials->filter(function ($material) {
+            $filteredOutsideMaterials = $category->materials->filter(function ($material) {
                 return $material->status === 'Cautelado' || $material->status === 'Manutenção';
             });
 
             // Filtra materiais que têm o status 'Disponível' ou 'Indisponível'
-            $filteredAvailableMaterial = $category->materials->filter(function ($material) {
+            $filteredAvailableMaterials = $category->materials->filter(function ($material) {
                 return $material->status === 'Disponível' || $material->status === 'Indisponível';
             });
 
             // Conta os materiais filtrados
-            $countOutsideMaterial = $filteredAvailableMaterials->count();
-            $countAvailableMaterial = $filteredAvailableMaterial->count();
+            $countOutsideMaterial = $filteredOutsideMaterials->count();
+            $countAvailableMaterial = $filteredAvailableMaterials->count();
 
             // Adiciona a contagem de material fora ao array de categorias
-            $category['outside_material'] = $countOutsideMaterial;
-            $category['available_material'] = $countAvailableMaterial;
+            $category['outside_material'] = $countOutsideMaterial == 0 ? '-' : $countOutsideMaterial;
+            $category['available_material'] = $countAvailableMaterial == 0 ? '-' : $countAvailableMaterial;
+
+        }
+
+        // Montar um array com as informações necessárias para o preenchimento do destino dos materiais (Cautelas e manutenção)
+
+        // Manutenção 
+        $maintenanceMaterialsWithDetails = [];
+
+        foreach ($maintenanceMaterials as $maintenance) {
+            foreach ($maintenance['materials'] as $materialId) {
+                $material = Material::find($materialId);
+
+                $maintenanceMaterialsWithDetails[] = [
+                    'maintenance' => $maintenance,
+                    'material' => $material->type,
+                ];
+            }
+        }
+
+        // Material em Destino
+
+        $loansWithDetails = [];
+
+        foreach ($openLoans as $loan) {
+            foreach (json_decode($loan['materials_info'], true) as $material) {
+                $material = Material::find($material['id']);
+
+                $category = $material->type;
+        
+                if (!isset($loansWithDetails[$category->name]) && $category->show_compliance == true) {
+                    
+                    $loansWithDetails[$category->name] = [
+                        'count' => 0,
+                        'to' => $loan->graduation . ' ' . $loan->name,
+                        'om' => $loan->to
+                    ];
+                }
+                if($category->show_compliance == true) {
+                    $loansWithDetails[$category->name]['count']++;
+                }   
+            }
         }
 
         // Encontrar o compliance desejado
@@ -58,7 +103,12 @@ class ReportController extends Controller
         }
 
         $path = '/storage/compliances/Pronto - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
-        $pdf = Pdf::loadView('reports.generate-compliance-pdf', ['config' => Configuration::find(1)], ['categories' => $categories])->save(public_path().$path);
+        $pdf = Pdf::loadView('reports.generate-compliance-pdf', [
+                'config' => Configuration::find(1), 
+                'categories' => $categories, 
+                'maintenanceMaterials' => $maintenanceMaterialsWithDetails,
+                'loansWithDetails' => $loansWithDetails
+            ])->save(public_path().$path);
 
         Compliance::create([
             'name' => 'Pronto - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf',

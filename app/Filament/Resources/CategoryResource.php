@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
@@ -21,7 +22,8 @@ use App\Filament\Resources\CategoryResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
 use App\Filament\Resources\CategoryResource\RelationManagers;
- 
+use Filament\Tables\Columns\ToggleColumn;
+
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
@@ -44,8 +46,11 @@ class CategoryResource extends Resource
                     ->description('As categorias serão usadas para agrupar os materiais no pronto')
                     ->schema([
                         TextInput::make('name')
-                        ->label('Nome')
-                        ->required()
+                            ->label('Nome')
+                            ->required(),
+
+                        Toggle::make('show_compliance')
+                            ->label('Mostrar no Pronto')
                     ])
                     ->columns(1),
 
@@ -89,11 +94,13 @@ class CategoryResource extends Resource
                     ->searchable(),
                 TextColumn::make('materials_count')->counts('materials')
                     ->label('Materiais'),
+                ToggleColumn::make('show_compliance')
+                    ->label('Mostrar no Pronto'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->label('Criado em')
                     ->formatStateUsing(function ($state) {
-                        return \Carbon\Carbon::parse($state)->format('d M Y \à\s H:i');
+                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y \à\s H:i');
                     })
                     ->searchable()
                     ->sortable()

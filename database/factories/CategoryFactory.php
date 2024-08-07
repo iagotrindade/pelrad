@@ -18,6 +18,7 @@ class CategoryFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'show_compliance' => fake()->boolean()
         ];
     }
 }

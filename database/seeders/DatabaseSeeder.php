@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Category::factory(2)->create();
-        Material::factory(5)->create();
+        //Category::factory(2)->create();
+        //Material::factory(5)->create();
         
         User::factory()->create([
             'avatar' => fake()->imageUrl(),
@@ -30,6 +30,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Iago Silva',
             'email' => 'iago23st1@gmail.com',
             'password' => Hash::make('12345678'),
+        ]);
+
+        $this->call([
+            CategoriesSeeder::class,
         ]);
 
         Configuration::factory()->create([

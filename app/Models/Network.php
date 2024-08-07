@@ -2,60 +2,51 @@
 
 namespace App\Models;
 
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Category extends Model
+class Network extends Model
 {
     use HasFactory, LogsActivity;
 
     protected $fillable = [
         'name',
-        'show_compliance'
+        'frequency',
+        'alternative_frequency',
+        'stations_data',
+        'file'
     ];
 
     protected $casts = [
-        'show_compliance' => 'boolean',
+        'stations_data' => 'array',
     ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
         ->logFillable()
-        ->logOnlyDirty()
+        ->logOnlyDirty()  
         ->setDescriptionForEvent(function(string $eventName) {
             switch ($eventName) {
                 case 'created':
-                    $eventName = 'Esta categoria foi criada';
+                    $eventName = 'Esta rede foi criada';
                     break;
     
                 case 'updated':
-                        $eventName = 'Esta categoria foi atualizada';
+                        $eventName = 'Esta rede foi alterada';
                         break;
 
-                case 'updated':
-                    $eventName = 'Esta categoria foi restaurada';
+                case 'restored':
+                    $eventName = 'Esta rede foi restaurada';
                     break;
     
                 case 'deleted':
-                    $eventName = 'Esta categoria foi deletada';
+                    $eventName = 'Esta rede foi deletada';
                     break;
             }
             return $eventName;
         });
-    }
-
-    public function materials(): HasMany
-    {
-        return $this->hasMany(Material::class, 'categories_id');
-    }
-
-    public function components(): HasMany
-    {
-        return $this->hasMany(Component::class);
     }
 }

@@ -37,7 +37,7 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {
@@ -113,7 +113,7 @@ class UserResource extends Resource
                     ->dateTime()
                     ->label('Criado em')
                     ->formatStateUsing(function ($state) {
-                        return \Carbon\Carbon::parse($state)->format('d M Y \à\s H:i');
+                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y \à\s H:i');
                     })
                     ->searchable()
                     ->sortable()

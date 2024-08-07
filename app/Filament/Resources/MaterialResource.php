@@ -70,6 +70,7 @@ class MaterialResource extends Resource
 
                         Select::make('categories_id')
                             ->label('Categoria')
+                            ->searchable()
                             ->options(Category::all()->pluck('name', 'id')),
 
                         Forms\Components\TextInput::make('serial_number')

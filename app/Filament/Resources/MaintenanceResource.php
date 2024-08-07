@@ -117,7 +117,7 @@ class MaintenanceResource extends Resource
                     ->dateTime()
                     ->label('Criado em')
                     ->formatStateUsing(function ($state) {
-                        return \Carbon\Carbon::parse($state)->format('d M Y \à\s H:i');
+                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y \à\s H:i');
                     })
                     ->searchable()
                     ->sortable(),

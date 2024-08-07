@@ -58,14 +58,14 @@
             .header-report-title {
                 font-size: 24px;
                 text-align: center;
-                margin-bottom: 10px;
+                margin: 10px 0;
             }
 
             .header-report-title p {
                 text-align: left
             }
 
-            .user-list {
+            .material-list {
                 width: 100%;
                 margin-bottom: 20px;
             }
@@ -98,6 +98,10 @@
                 margin-bottom: 40px;
                 text-align: center;
             }
+
+            .page-break {
+                page-break-after: always;
+            }
         </style>
 
         <div class="pdf-container">
@@ -119,7 +123,7 @@
                 <h1>CONFORMIDADE PELOTÃO RÁDIO CCPCR</h1>
             </div>
 
-            <div class="user-list">
+            <div class="material-list">
                 <table>
                     <thead>
                         <tr>
@@ -140,7 +144,7 @@
                                     @if(!empty($category->materials))
                                         {{ $category['material_count'] }}
                                     @else 
-                                        0
+                                        -
                                     @endif
                                 </td>
 
@@ -157,45 +161,71 @@
                 </table>
             </div>
 
+            <div class="page-break"></div>
+
             <div class="header-report-title">
                 <h1>DISTRIBUIÇÃO DE EQUIPAMENTO RÁDIO EM DESTINO</h1>
             </div>
 
-            <div class="user-list">
+            <div class="material-list">
                 <table>
                     <thead>
                         <tr>
                             <th>MATERIAL</th>
                             <th>DESTINO</th>
                             <th>QUANTIDADE</th>
-                            <th>TOTAL</th>
                             <th>OM</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        @foreach($categories as $category)
-                            <tr>    
-                                <td>
-                                    {{ Str::upper($category->name) }}
-                                </td>
-                                
-                                <td>
-                                    @if(!empty($category->materials))
-                                        {{ $category['material_count'] }}
-                                    @else 
-                                        0
+                        @if (!empty($maintenanceMaterials))
+                            @foreach($maintenanceMaterials as $index => $maintenance)
+                                <tr>    
+                                    <td>
+                                        {{ Str::upper($maintenance['material']->name) }}
+                                    </td>
+                                    
+                                    @if ($index == 0)
+                                        <td rowspan="{{ count($maintenanceMaterials) }}">
+                                            MANUTENÇÃO
+                                        </td>
                                     @endif
-                                </td>
 
-                                <td>
-                                    {{ $category['outside_material'] }}
-                                </td>
+                                    <td>
+                                        1
+                                    </td>
 
-                                <td>
-                                    {{ $category['available_material'] }}    
-                                </td>
-                            </tr>
-                        @endforeach
+                                    <td>
+                                        {{ Str::upper($maintenance['maintenance']->destiny)}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
+                        
+                        @if (!empty($loansWithDetails))
+                            @foreach($loansWithDetails as $name => $loan)
+                                <tr>    
+                                    <td>
+                                        {{ Str::upper($name) }}
+                                    </td>
+                                    
+
+                                    <td>
+                                        {{ Str::upper($loan['to']) }}
+                                    </td>
+
+                                    <td>
+                                        {{ Str::upper($loan['count']) }}
+                                    </td>
+
+                                    <td>
+                                        {{ Str::upper($loan['om']) }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
+                            
                     </tbody>
                 </table>
             </div>

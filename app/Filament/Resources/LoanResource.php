@@ -14,6 +14,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Wizard;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -22,12 +23,13 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Wizard\Step;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\BulkActionGroup;
 use App\Filament\Resources\LoanResource\Pages;
+use Filament\Tables\Actions\RestoreBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LoanResource\RelationManagers;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\RestoreBulkAction;
 
 class LoanResource extends Resource
 {
@@ -62,25 +64,31 @@ class LoanResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('from')
+                TextColumn::make('from')
                     ->searchable()
                     ->label('De:'),
-                Tables\Columns\TextColumn::make('to')
+                TextColumn::make('to')
                     ->searchable()
                     ->label('Para:'),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Criado em:')
+                    ->formatStateUsing(function ($state) {
+                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y \à\s H:i');
+                    })
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->label('Atualizado em:')
+                    ->formatStateUsing(function ($state) {
+                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y \à\s H:i');
+                    })
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('download')
+                TextColumn::make('download')
                     ->label('PDF')
                     ->url(fn (Loan $record): string => 'http://filament-app.test/'.$record->file.'')
                     ->default('Download')
@@ -101,7 +109,7 @@ class LoanResource extends Resource
                             );
                 }),
 
-                Tables\Filters\TrashedFilter::make()
+                TrashedFilter::make()
             ])
 
             ->actions([
