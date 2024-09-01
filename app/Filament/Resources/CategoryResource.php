@@ -51,6 +51,7 @@ class CategoryResource extends Resource
 
                         Toggle::make('show_compliance')
                             ->label('Mostrar no Pronto')
+                            ->default(true)
                     ])
                     ->columns(1),
 
@@ -75,7 +76,8 @@ class CategoryResource extends Resource
                                     TextInput::make('quantity')
                                         ->required()
                                         ->numeric()
-                                        ->label('Quantidade'),
+                                        ->label('Quantidade')
+                                        ->default(1),
                                 ])
                                 ->columns(4)
                                 ->label('Componentes')

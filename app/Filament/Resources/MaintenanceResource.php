@@ -9,6 +9,7 @@ use App\Models\Material;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Maintenance;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Filters\Filter;
@@ -23,13 +24,15 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Forms\Components\MarkdownEditor;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\MaintenanceResource\Pages;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
 use App\Filament\Resources\MaintenanceResource\RelationManagers;
+use Joaopaulolndev\FilamentPdfViewer\Infolists\Components\PdfViewerEntry;
 
 class MaintenanceResource extends Resource
 {
@@ -58,7 +61,10 @@ class MaintenanceResource extends Resource
                             ->required()
                             ->label('Materiais')
                             ->multiple()
-                            ->getSearchResultsUsing(fn (string $search): array => Material::where('name', 'like', "%{$search}%")->limit(50)->pluck('name', 'id')->toArray())
+                            ->getSearchResultsUsing(fn (string $search): array => Material::where('name', 'like', "%{$search}%")
+                            ->whereNot(function (Builder $query) {
+                                $query->where('status', 'Cautelado');
+                            })->pluck('name', 'id')->toArray())
                             ->getOptionLabelsUsing(fn (array $values): array => Material::whereIn('id', $values)->pluck('name', 'id')->toArray()),
 
                         MarkdownEditor::make('description')
@@ -176,6 +182,39 @@ class MaintenanceResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Dados da Manutenção')
+                    ->description('Esses dados são os preenchidos no ato da criação da manutenção')
+                    ->schema([
+                        TextEntry::make('destiny')
+                            ->label('Local da Manutenção'),
+                        TextEntry::make('created_at')
+                            ->label('Data de Criação')
+                            ->formatStateUsing(function ($state) {
+                                return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
+                            }),   
+                        TextEntry::make('updated_at')
+                            ->label('Última atualização')
+                            ->formatStateUsing(function ($state) {
+                                return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
+                            }),   
+                        TextEntry::make('status')
+                            ->label('Situação'),   
+                    ])->columns(4),
+                \Filament\Infolists\Components\Section::make('Guia de Remessa')
+                    ->description('Documento gerado pelo S4')
+                    ->collapsible()
+                    ->schema([
+                        PdfViewerEntry::make('file')
+                            ->label('')
+                            ->minHeight('80svh'),
+                    ]),  
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -188,6 +227,7 @@ class MaintenanceResource extends Resource
         return [
             'index' => Pages\ListMaintenances::route('/'),
             'create' => Pages\CreateMaintenance::route('/create'),
+            'view' => Pages\ViewMaintenance::route('/{record}/view'),
             'edit' => Pages\EditMaintenance::route('/{record}/edit'),
         ];
     }

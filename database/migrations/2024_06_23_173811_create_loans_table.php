@@ -23,6 +23,7 @@ return new class extends Migration
             $table->timestamp('return_date');
             $table->string('status');
             $table->string('file');
+            $table->string('signed_file')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

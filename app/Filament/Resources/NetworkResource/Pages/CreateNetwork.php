@@ -24,7 +24,7 @@ class CreateNetwork extends CreateRecord
 
         $data['file'] = '/storage/drrs/Diagrama Rede Rádio '.$data['name'].' '.Carbon::now()->format('d.m.Y H\hi').'.pdf';
 
-        Pdf::loadView('drrs.generate-network-file', ['drrData' => $data])->save(public_path().''.$data['file'].'')->stream('download.pdf');
+        Pdf::loadView('drrs.generate-network-file', ['drrData' => $data])->save(public_path().''.$data['file'].'')->setPaper('a4', 'landscape')->stream('download.pdf');
 
         $record = static::getModel()::create($data);
  

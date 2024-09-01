@@ -19,4 +19,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('gerar/relatorio/auditoria', [ReportController::class, 'generateAuditReport'])->name('report.audit');
 });
 
+Route::get('teste', function () {
+    return view('drrs.generate-network-file');
+});
+
 

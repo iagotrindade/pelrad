@@ -109,6 +109,8 @@ class CreateLoan extends CreateRecord
 
         Pdf::loadView('reports.generate-loan-pdf', ['data' => $data, 'config' => Configuration::find(1)])->save(public_path().''.$data['file'].'')->stream('download.pdf');
 
+        $data['file'] = 'loans/Cautela '.$data['graduation'].' - '.$data['name'].' '.$data['to'].' '.Carbon::now()->format('d.m.Y H\hi').'.pdf';
+
         return $data;
     }
 

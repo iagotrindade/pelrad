@@ -39,7 +39,7 @@ class NetworkResource extends Resource
                 Section::make()
                     ->schema([
                         TextInput::make('name')
-                        ->label('Nome')
+                        ->label('Nome da Rede')
                         ->required(),
                     TextInput::make('frequency')
                         ->label('Frequência')
@@ -68,7 +68,7 @@ class NetworkResource extends Resource
                         ->columns(4)
                         ->label('Postos')
                         ->collapsible()
-                        ->defaultItems(6)
+                        ->defaultItems(3)
                         ->columns(2)
                 ])
             ]);

@@ -36,7 +36,7 @@
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                margin-bottom: 20px;
+                margin-bottom: 80px;
             }
 
             .pdf-header h1 {
@@ -51,12 +51,66 @@
                 margin-bottom: 10px;
             }
 
+            .drrs-display {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
             .drr-area {
-                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 250px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                margin: 30px 50px;
+            }
+
+            .station-row {
+                display: flex;
+                justify-content: space-between;
+                width: 290px;
+            }
+
+            .pdr-station {
+                display: flex;
+                justify-content: center;
                 width: 100%;
-                height: 100vh;
-                border: 1px solid #000;
+            }
+            
+            .pdr-station-names {
+                border: 1px solid #ccc;
+                border-radius: 360px;
+                width: 50px;
+                height: 50px;
+                text-align: center;
+                padding: 10px;
+                margin-top: -75px;
                 margin-bottom: 20px;
+            }
+
+            .station {
+                border: 1px solid #ccc;
+                border-radius: 360px;
+                width: 50px;
+                height: 50px;
+                text-align: center;
+                padding: 10px;
+                margin-bottom: 35px;
+            }
+
+            .first-station-row {
+                margin-top: -25px;
+            }
+
+            .last-station-row {
+                margin-bottom: -20px;
+            }
+
+            .station-name, .station-slug {
+                font-size: 10px;
             }
 
             .center {
@@ -71,21 +125,58 @@
         <div class="pdf-container">
             <div class="pdf-header">
                 <h1>Diagrama Rede Rádio</h1>
-                <p>Nome: {{ $drrData['name'] }}</p>
+                <p>Nome: NOME DA REDE</p>
             </div>
-                
+             
             <div class="drr-area">
-                <div class="f3e">F3E</div>
-                <div class="manitu">Manitu</div>
-                <div class="s3">S3</div>
-
-                @foreach($drrData['stations_data'] as $index => $station)
-                    <div class="station" id="posto{{ $index + 1 }}">
-                        <div class="station-name">{{ $station['station_name'] }}</div>
-                        <div class="station-slug">{{ $station['station_slug'] }}</div>
+                <div class="pdr-station">
+                    <div class="pdr-station-names">
+                        <p class="station-name">POSTO 1</p>
+                        <p class="station-slug">SLUG DO POSTO</p>
                     </div>
-                @endforeach
+                </div>
+
+                <div class="station-row first-station-row">
+                    <div class="station">
+                        <p class="station-name">POSTO 2</p>
+                        <p class="station-slug">SLUG DO POSTO</p>
+                    </div>
+
+                    <div class="station">
+                        <p class="station-name">POSTO 3</p>
+                        <p class="station-slug">SLUG DO POSTO</p>
+                    </div>
+                </div>
+
+                <div class="station-row">
+                    <div class="station">
+                        <p class="station-name">POSTO 2</p>
+                        <p class="station-slug">SLUG DO POSTO</p>
+                    </div>
+
+                    <div class="station">
+                        <p class="station-name">POSTO 3</p>
+                        <p class="station-slug">SLUG DO POSTO</p>
+                    </div>
+                </div>
+
+                <div class="station-row ">
+                    <div class="station-area last-station-row">
+                        <div class="station">
+                            <p class="station-name">POSTO 2</p>
+                            
+                        </div>
+
+                        
+                    </div>
+                        
+
+                    <div class="station last-station-row">
+                        <p class="station-name">POSTO 3</p>
+                        <p class="station-slug">SLUG DO POSTO</p>
+                    </div>
+                </div>
             </div>
-        </div>
+        </div>  
     </body>
 </html>

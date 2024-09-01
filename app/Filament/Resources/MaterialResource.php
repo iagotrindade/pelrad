@@ -108,6 +108,7 @@ class MaterialResource extends Resource
                             ->validationMessages([
                                 'status' => 'Não é possível alterar o :attribute por que ele está em manutenção ou cautelado.',
                             ])
+                            ->default('Disponível'),
                     ])->columns(3),
             ]);
     }

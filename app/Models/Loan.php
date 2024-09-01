@@ -22,6 +22,7 @@ class Loan extends Model
         'materials_info',
         'return_date',
         'file',
+        'signed_file',
         'status'
     ];
 

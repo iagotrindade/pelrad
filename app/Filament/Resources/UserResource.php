@@ -46,6 +46,7 @@ class UserResource extends Resource
                 Forms\Components\Section::make()
                 ->schema([
                     FileUpload::make('avatar')
+                        ->label('Imagem do Usuário')
                         ->imageEditor()
                         ->imageEditorAspectRatios([
                             '16:9',
@@ -76,13 +77,16 @@ class UserResource extends Resource
                     ]),
                     
                     TextInput::make('name')
-                    ->required(),
+                        ->label('Nome')
+                        ->required(),
 
                     TextInput::make('email')
+                        ->label('Email')
                         ->email()
                         ->required(),
 
                     TextInput::make('password')
+                        ->label('Senha')
                         ->password()
                         ->required(),
                 ])->columns(2),

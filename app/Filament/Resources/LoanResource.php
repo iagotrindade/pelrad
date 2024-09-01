@@ -6,13 +6,18 @@ use Filament\Forms;
 use App\Models\Loan;
 use App\Models\User;
 use Filament\Tables;
+use Filament\Infolists;
 use App\Models\Material;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Storage;
@@ -20,16 +25,24 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Wizard\Step;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Tables\Actions\DeleteBulkAction;
 use App\Filament\Resources\LoanResource\Pages;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LoanResource\RelationManagers;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
+use Joaopaulolndev\FilamentPdfViewer\Forms\Components\PdfViewerField;
+use Joaopaulolndev\FilamentPdfViewer\Infolists\Components\PdfViewerEntry;
 
 class LoanResource extends Resource
 {
@@ -51,12 +64,21 @@ class LoanResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'Aberta' => 'Aberta',
-                        'Fechada' => 'Fechada'
-                    ])
+                Section::make('Situação')
+                    ->description('Altere a situação e anexe a cautela assinada')
+                    ->schema([
+                        Select::make('status')
+                        ->label('Status')
+                        ->options([
+                            'Aberta' => 'Aberta',
+                            'Fechada' => 'Fechada'
+                        ]),
+                        FileUpload::make('signed_file')
+                            ->label('Cautela Assinada')
+                            ->directory('loans')
+                            ->acceptedFileTypes(['application/pdf']),
+                        
+                    ]),
             ]);
     }
 
@@ -90,7 +112,7 @@ class LoanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('download')
                     ->label('PDF')
-                    ->url(fn (Loan $record): string => 'http://filament-app.test/'.$record->file.'')
+                    ->url(fn (Loan $record): string => 'http://filament-app.test/storage/'.$record->file.'')
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->openUrlInNewTab()
@@ -114,7 +136,9 @@ class LoanResource extends Resource
 
             ->actions([
                 ActivityLogTimelineAction::make('Logs'),
-                Tables\Actions\DeleteAction::make()->before(function ($record) {
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make()->before(function ($record) {
                     $authUser = auth()->user();
                     $recipients = User::all();
 
@@ -145,13 +169,61 @@ class LoanResource extends Resource
                     ->sendToDatabase($recipients);
                 }),
 
-                Tables\Actions\RestoreAction::make(),
+                
+                RestoreAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make()
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make()
                 ]),
+            ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Dados da Cautela')
+                    ->description('Esses dados são os preenchidos no ato da cautela')
+                    ->schema([
+                        TextEntry::make('to')
+                            ->label('Organização Militar'),
+                        TextEntry::make('graduation')
+                            ->label('Graduação'),
+                        TextEntry::make('name')
+                            ->label('Nome'),
+                        TextEntry::make('idt')
+                            ->label('Identindade'),
+                        TextEntry::make('contact')
+                            ->url(fn (Loan $record): string => 'https://wa.me/55'.str_replace(['(', ')', '-', ' '], '', $record->contact).'', shouldOpenInNewTab: true)
+                            ->label('Contato'),
+                        TextEntry::make('return_date')
+                            ->label('Previsão de retorno')
+                            ->formatStateUsing(function ($state) {
+                                return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
+                            }),    
+                        TextEntry::make('status')
+                            ->label('Situação'),   
+                    ])->columns(4),
+                \Filament\Infolists\Components\Section::make('Cautela não Assinada')
+                    ->description('PDF gerado na criação cautela')
+                    ->collapsible()
+                    ->schema([
+                        PdfViewerEntry::make('file')
+                            ->label('')
+                            ->minHeight('80svh'),
+                    ]),
+
+                \Filament\Infolists\Components\Section::make('Cautela Assinada')
+                    ->description('Inserida no sistema após assinatura')
+                    ->collapsible()
+                    ->schema([
+                        PdfViewerEntry::make('signed_file')
+                            ->label('')
+                            ->minHeight('80svh')
+                    ]),
+                
             ]);
     }
 
@@ -172,6 +244,7 @@ class LoanResource extends Resource
         return [
             'index' => Pages\ListLoans::route('/'),
             'create' => Pages\CreateLoan::route('/create'),
+            'view' => Pages\ViewLoan::route('/{record}'),
             'edit' => Pages\EditLoan::route('/{record}/edit'),
         ];
     }

@@ -91,7 +91,7 @@ class ReportController extends Controller
         }
 
         // Encontrar o compliance desejado
-        $compliance = $compliances->firstWhere('name', 'Pronto - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf');
+        $compliance = $compliances->firstWhere('name', 'Pronto - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf');
 
         if($compliance) {
             // Verificar se o arquivo existe antes de tentar excluir
@@ -102,7 +102,7 @@ class ReportController extends Controller
             $compliance->delete();
         }
 
-        $path = '/storage/compliances/Pronto - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
+        $path = '/storage/compliances/Pronto - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf';
         $pdf = Pdf::loadView('reports.generate-compliance-pdf', [
                 'config' => Configuration::find(1), 
                 'categories' => $categories, 
@@ -111,17 +111,17 @@ class ReportController extends Controller
             ])->save(public_path().$path);
 
         Compliance::create([
-            'name' => 'Pronto - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf',
+            'name' => 'Pronto - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf',
             'file' => $path
         ]);
 
-        return $pdf->stream('Pronto - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf');
+        return $pdf->stream('Pronto - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf');
     }   
 
     public function generateUserReport() {
         $users = User::all();
 
-        $name = 'Relatório de usuários - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
+        $name = 'Relatório de usuários - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf';
         $path = '/storage/reports/'.$name.'';
 
         $pdf = Pdf::loadView('reports.generate-users-report', ['config' => Configuration::find(1), 'users' => $users])->save(public_path().$path);

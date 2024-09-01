@@ -65,11 +65,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 ActivitylogPlugin::make()
-                ->label('Log')
-                ->pluralLabel('Logs')
-                ->navigationIcon('heroicon-o-shield-check')
-                ->navigationCountBadge(true)
-                ->navigationGroup('Auditoria')
+                    ->label('Log')
+                    ->pluralLabel('Logs')
+                    ->navigationIcon('heroicon-o-shield-check')
+                    ->navigationCountBadge(true)
+                    ->navigationGroup('Auditoria'),
+                \TomatoPHP\FilamentMediaManager\FilamentMediaManagerPlugin::make()
+                    ->allowSubFolders()
+                
             ])
             ->breadcrumbs(false)
             ->middleware([
