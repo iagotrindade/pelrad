@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
 
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('gerar/pronto', [ReportController::class, 'generateComplianceReport'])->name('report.compliance');
 
     Route::get('gerar/relatorio/usuário', [ReportController::class, 'generateUserReport'])->name('report.users');
@@ -20,7 +20,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 Route::get('teste', function () {
-    return view('drrs.generate-network-file');
+    return view('reports.generate-compliance-pdf');
 });
 
 

@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\MaintenanceResource\Pages;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
 use App\Filament\Resources\MaintenanceResource\RelationManagers;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 use Joaopaulolndev\FilamentPdfViewer\Infolists\Components\PdfViewerEntry;
 
 class MaintenanceResource extends Resource
@@ -148,7 +149,7 @@ class MaintenanceResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                ActivityLogTimelineAction::make('Logs'),
+                ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->before(function ($record) {
                     $authUser = auth()->user();

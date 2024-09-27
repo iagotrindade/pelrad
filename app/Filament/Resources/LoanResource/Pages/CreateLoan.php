@@ -146,21 +146,21 @@ class CreateLoan extends CreateRecord
                     ]),
 
                     TextInput::make('name')
-                    ->required()
-                    ->label('Nome')
-                    ->live(),
+                        ->required()
+                        ->label('Nome')
+                        ->live(),
 
                     TextInput::make('idt')
-                    ->required()
-                    ->label('Identidade')
-                    ->live(),
+                        ->required()
+                        ->label('Identidade')
+                        ->live(),
 
                     TextInput::make('contact')
-                    ->mask('(99) 9-9999-9999')
-                    ->required()
-                    ->label('Contato')
-                    ->length(16)
-                    ->live()
+                        ->mask('(99) 9-9999-9999')
+                        ->required()
+                        ->label('Contato')
+                        ->length(16)
+                        ->live()
             ])->columns(3),
 
             Step::make('Materiais')

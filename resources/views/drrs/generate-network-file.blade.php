@@ -4,11 +4,15 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Diagrama Rede Rádio</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>Relatório de atividade dos usuários Pelotão Rádio CCPCR</title>
     </head>
-    
     <body>
         <style>
+            .page-break {
+                page-break-after: always;
+            }
+
             * {
                 margin: 0;
                 padding: 0;
@@ -22,161 +26,123 @@
                 justify-content: center;
             }
 
-            .page-break {
-                page-break-after: always;
-            }
-
             .pdf-container {
-                max-width: 1000px;
+                max-width: 1200px;
                 padding: 20px
             }
 
-            .pdf-header {
+            .header-img-area {
                 display: flex;
-                flex-direction: column;
                 justify-content: center;
-                align-items: center;
-                margin-bottom: 80px;
+                text-align: center;
             }
 
-            .pdf-header h1 {
-                font-size: 18px;
+            .header-image {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 10px;
+            }
+
+            .header-text {
+                text-align: center;
+            }
+
+            .header-report-title {
+                font-size: 24px;
                 text-align: center;
                 margin-bottom: 10px;
             }
 
-            .pdf-header p {
-                font-size: 14px;
-                text-align: center;
-                margin-bottom: 10px;
+            .header-report-title p {
+                text-align: left
             }
 
-            .drrs-display {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-wrap: wrap;
-            }
-
-            .drr-area {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                width: 250px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-                margin: 30px 50px;
-            }
-
-            .station-row {
-                display: flex;
-                justify-content: space-between;
-                width: 290px;
-            }
-
-            .pdr-station {
-                display: flex;
-                justify-content: center;
+            .user-list {
                 width: 100%;
-            }
-            
-            .pdr-station-names {
-                border: 1px solid #ccc;
-                border-radius: 360px;
-                width: 50px;
-                height: 50px;
-                text-align: center;
-                padding: 10px;
-                margin-top: -75px;
                 margin-bottom: 20px;
             }
+            
+            .user-image {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+            }
 
-            .station {
-                border: 1px solid #ccc;
-                border-radius: 360px;
-                width: 50px;
-                height: 50px;
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-block: 10px
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
                 text-align: center;
-                padding: 10px;
-                margin-bottom: 35px;
             }
-
-            .first-station-row {
-                margin-top: -25px;
-            }
-
-            .last-station-row {
-                margin-bottom: -20px;
-            }
-
-            .station-name, .station-slug {
-                font-size: 10px;
-            }
-
-            .center {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+            th {
+                background-color: #f2f2f2;
                 text-align: center;
+            }
+
+            .causer-head {
+                text-align: center;
+                font-weight: bold;
+                background-color: #f2f2f2;
             }
         </style>
 
-        <div class="pdf-container">
-            <div class="pdf-header">
-                <h1>Diagrama Rede Rádio</h1>
-                <p>Nome: NOME DA REDE</p>
-            </div>
-             
-            <div class="drr-area">
-                <div class="pdr-station">
-                    <div class="pdr-station-names">
-                        <p class="station-name">POSTO 1</p>
-                        <p class="station-slug">SLUG DO POSTO</p>
-                    </div>
+        @for ($i = 0; $i < $drrData['drr_quantity']; $i++)
+            <div class="pdf-container">
+                <div class="header-report-title">
+                    <h1>QUADRO REDE RÁDIO</h1>
+                    <h1>{{Str::upper($drrData['name'])}}</h1>
                 </div>
 
-                <div class="station-row first-station-row">
-                    <div class="station">
-                        <p class="station-name">POSTO 2</p>
-                        <p class="station-slug">SLUG DO POSTO</p>
-                    </div>
-
-                    <div class="station">
-                        <p class="station-name">POSTO 3</p>
-                        <p class="station-slug">SLUG DO POSTO</p>
-                    </div>
-                </div>
-
-                <div class="station-row">
-                    <div class="station">
-                        <p class="station-name">POSTO 2</p>
-                        <p class="station-slug">SLUG DO POSTO</p>
-                    </div>
-
-                    <div class="station">
-                        <p class="station-name">POSTO 3</p>
-                        <p class="station-slug">SLUG DO POSTO</p>
-                    </div>
-                </div>
-
-                <div class="station-row ">
-                    <div class="station-area last-station-row">
-                        <div class="station">
-                            <p class="station-name">POSTO 2</p>
-                            
-                        </div>
-
+                <div class="userlist">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>POSTO</th>
+                                <th>RESPONSÁVEL</th>
+                                <th>TEL CONTATO</th>
+                                <th>RADIOPERADOR</th>
+                                <th>CANAIS</th>
+                            </tr>
+                        </thead>
                         
-                    </div>
-                        
+                        <tbody>
+                            @foreach ($drrData['stations_data'] as $data)
+                                <tr>
+                                    <td>
+                                        {{  Str::upper($data['station_name'])   }}
+                                    </td>
+                                                
+                                    <td>
+                                        {{  Str::upper($data['responsible'])    }}
+                                    </td>
 
-                    <div class="station last-station-row">
-                        <p class="station-name">POSTO 3</p>
-                        <p class="station-slug">SLUG DO POSTO</p>
-                    </div>
+                                    <td>
+                                        {{  Str::upper($data['phone'])  }}  
+                                    </td>
+
+                                    <td>
+                                        {{  Str::upper($data['radop'])  }}
+                                    </td>
+
+                                    @if (   $loop->iteration == 1   )
+                                        <td rowspan="{{count($drrData['stations_data'])}}">
+                                            PRINCIPAL: {{  Str::upper($drrData['frequency'])  }}
+                                            <br>
+                                            RESERVA: {{  Str::upper($drrData['alternative_frequency'])  }}
+                                        </td>
+                                    @endif   
+                                </tr>
+                            @endforeach     
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>  
+
+            <br>
+        @endfor
     </body>
 </html>

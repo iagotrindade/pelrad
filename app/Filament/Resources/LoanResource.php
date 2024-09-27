@@ -41,6 +41,7 @@ use Filament\Tables\Actions\RestoreBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LoanResource\RelationManagers;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 use Joaopaulolndev\FilamentPdfViewer\Forms\Components\PdfViewerField;
 use Joaopaulolndev\FilamentPdfViewer\Infolists\Components\PdfViewerEntry;
 
@@ -135,7 +136,7 @@ class LoanResource extends Resource
             ])
 
             ->actions([
-                ActivityLogTimelineAction::make('Logs'),
+                ActivityLogTimelineTableAction::make('Logs'),
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()->before(function ($record) {

@@ -81,9 +81,9 @@ class LoanDistribution extends ChartWidget
                     'backgroundColor' => 'rgb(56, 189, 248)',
                     'borderColor' => '#9BD0F5',
                     'backgroundColor' => [
-                        '#081c15',
-                        '#1b4332',
-                        '#2d6a4f',
+                        '#179bef',
+                        '#3bb4f3',
+                        '#5ecdf7',
                       ],
 
                 ],

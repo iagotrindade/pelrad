@@ -17,12 +17,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\CategoryResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
 use App\Filament\Resources\CategoryResource\RelationManagers;
-use Filament\Tables\Columns\ToggleColumn;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 
 class CategoryResource extends Resource
 {
@@ -111,7 +112,7 @@ class CategoryResource extends Resource
                 
             ])
             ->actions([
-                ActivityLogTimelineAction::make('Logs'),
+                ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->after(function ($record) {
                     $authUser = auth()->user();

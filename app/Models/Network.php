@@ -16,6 +16,7 @@ class Network extends Model
         'frequency',
         'alternative_frequency',
         'stations_data',
+        'drr_quantity',
         'file'
     ];
 
@@ -31,7 +32,7 @@ class Network extends Model
         ->setDescriptionForEvent(function(string $eventName) {
             switch ($eventName) {
                 case 'created':
-                    $eventName = 'Esta rede foi criada';
+                    $eventName = 'Nova rede rádio criada';
                     break;
     
                 case 'updated':

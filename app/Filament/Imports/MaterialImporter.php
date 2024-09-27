@@ -14,32 +14,15 @@ class MaterialImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            ImportColumn::make('images')
-                ->requiredMapping()
-                ->rules(['required', 'max:255']),
-            ImportColumn::make('record_number')
-                ->rules(['max:255']),
-            ImportColumn::make('patrimony_number')
-                ->rules(['max:255']),
-            ImportColumn::make('patrimony_value')
-                ->rules(['max:255']),
-            ImportColumn::make('inclusion_document')
-                ->rules(['max:255']),
-            ImportColumn::make('inclusion_date')
-                ->rules(['datetime']),
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
             ImportColumn::make('serial_number')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('description'),
             ImportColumn::make('status')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('categories_id')
-                ->numeric()
-                ->rules(['integer']),
         ];
     }
 

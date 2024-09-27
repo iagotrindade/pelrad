@@ -2,12 +2,15 @@
 
 namespace App\Providers\Filament;
 
+use App\Routes;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Widgets\DevInfoWidget;
 use Filament\PanelProvider;
 use Filament\Actions\Action;
+use App\Filament\Pages\Settings;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationItem;
 use Filament\Navigation\NavigationGroup;
@@ -15,6 +18,7 @@ use Filament\Http\Middleware\Authenticate;
 use Rmsramos\Activitylog\ActivitylogPlugin;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use TomatoPHP\FilamentNotes\FilamentNotesPlugin;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -22,9 +26,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use App\Filament\Pages\Settings;
-use Filament\Navigation\MenuItem;
-use App\Routes;
+use TomatoPHP\FilamentMediaManager\FilamentMediaManagerPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -34,12 +36,12 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->spa()
             ->id('admin')
-            ->path('admin')
+            ->path('')
             ->login()
             ->passwordReset()
             ->emailVerification()
             ->colors([
-                'primary' => '#15803d',
+                'primary' => '#179bef',
             ])
             ->profile(isSimple: false)
             ->databaseNotifications()
@@ -54,14 +56,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationItems([
                 NavigationItem::make('Gerar Pronto')
-                    ->url('/admin/gerar/pronto', shouldOpenInNewTab: true)
+                    ->url('/gerar/pronto', shouldOpenInNewTab: true)
                     ->icon('heroicon-o-presentation-chart-line')
                     ->sort(6),
-            ])
-            ->navigationGroups([
-                NavigationGroup::make('Auditoria')
-                     ->label('Relatórios')
-                     ->icon('heroicon-o-shopping-cart'),
+                NavigationItem::make('Orientações')
+                    ->url('/storage/oracle/repository/orientation.pdf', shouldOpenInNewTab: true)
+                    ->icon('heroicon-o-book-open')
+                    ->group('Ferramentas')
+                    ->sort(2)
             ])
             ->plugins([
                 ActivitylogPlugin::make()
@@ -69,10 +71,15 @@ class AdminPanelProvider extends PanelProvider
                     ->pluralLabel('Logs')
                     ->navigationIcon('heroicon-o-shield-check')
                     ->navigationCountBadge(true)
-                    ->navigationGroup('Auditoria'),
-                \TomatoPHP\FilamentMediaManager\FilamentMediaManagerPlugin::make()
-                    ->allowSubFolders()
-                
+                    ->navigationGroup('Ferramentas'),
+                FilamentMediaManagerPlugin::make()
+                    ->allowSubFolders(),
+                FilamentNotesPlugin::make()
+                    ->useStatus()
+                    ->useGroups()
+                    ->useShareLink()
+                    ->useChecklist()
+                    ->useUserAccess()
             ])
             ->breadcrumbs(false)
             ->middleware([

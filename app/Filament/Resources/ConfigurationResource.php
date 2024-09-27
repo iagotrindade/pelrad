@@ -17,6 +17,7 @@ use Filament\Forms\Components\Wizard\Step;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ConfigurationResource\Pages;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 use App\Filament\Resources\ConfigurationResource\RelationManagers;
 
 class ConfigurationResource extends Resource
@@ -29,7 +30,7 @@ class ConfigurationResource extends Resource
 
     protected static ?string $modelLabel = 'Configurações';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 8;
 
     public static function form(Form $form): Form
     {
@@ -101,7 +102,7 @@ class ConfigurationResource extends Resource
                 //
             ])
             ->actions([
-                ActivityLogTimelineAction::make('Logs'),
+                ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

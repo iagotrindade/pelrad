@@ -114,7 +114,7 @@
         <div class="pdf-container">
             <div class="pdf-header">
                 <div class="header-img-area">
-                    <img class="header-image" src="{{url("storage/panel-assets/eb-logo.png")}}" alt="Exército Brasileiro">
+                    <img class="header-image" src="{{ public_path('storage/panel-assets/eb-logo.png') }}" alt="Exército Brasileiro">
                 </div>
 
                 <p class="header-text">
@@ -150,9 +150,9 @@
                             <tr>
                                 <td>
                                     @if (!empty($material->images[0]))
-                                        <img class="material-image" src="{{ url('storage/'.$material->images[0].'') }}" alt="Imagem do Material">
+                                        <img class="material-image" src="{{ public_path('storage/'.$material->images[0].'') }}" alt="Imagem do Material">
                                     @else 
-                                        <img class="material-image" src="{{ url('storage/panel-assets/material_placeholder.png') }}" alt="Imagem do Material">
+                                        <img class="material-image" src="{{ public_path('storage/panel-assets/material_placeholder.png') }}" alt="Imagem do Material">
                                     @endif
                                     
 

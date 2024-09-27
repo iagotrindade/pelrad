@@ -30,14 +30,14 @@ class Category extends Model
         ->setDescriptionForEvent(function(string $eventName) {
             switch ($eventName) {
                 case 'created':
-                    $eventName = 'Esta categoria foi criada';
+                    $eventName = 'Nova categoria criada';
                     break;
     
                 case 'updated':
                         $eventName = 'Esta categoria foi atualizada';
                         break;
 
-                case 'updated':
+                case 'restored':
                     $eventName = 'Esta categoria foi restaurada';
                     break;
     

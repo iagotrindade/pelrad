@@ -24,7 +24,7 @@ class GeneralOverview extends BaseWidget
                 Stat::make('Relatório de Usuários', User::all()->count())
                     ->descriptionIcon('heroicon-m-user-group')
                     ->description('Dados dos usuários')
-                    ->color('success')
+                    ->color('primary')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
@@ -33,7 +33,7 @@ class GeneralOverview extends BaseWidget
                 Stat::make('Relatório de Categorias', Category::all()->count())
                     ->descriptionIcon('heroicon-o-tag')
                     ->description('Dados das categorias')
-                    ->color('success')
+                    ->color('primary')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
@@ -43,7 +43,7 @@ class GeneralOverview extends BaseWidget
                 Stat::make('Relatório de Materiais', Material::all()->count())
                     ->descriptionIcon('heroicon-m-cube')
                     ->description('Dados dos materiais')
-                    ->color('success')
+                    ->color('primary')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
@@ -52,7 +52,7 @@ class GeneralOverview extends BaseWidget
                 Stat::make('Relatório de Cautelas', Loan::all()->count())
                     ->descriptionIcon('heroicon-m-clipboard-document-list')
                     ->description('Dados das cautelas')
-                    ->color('success')
+                    ->color('primary')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
@@ -61,7 +61,7 @@ class GeneralOverview extends BaseWidget
                 Stat::make('Relatório de Configurações', Configuration::all()->count())
                     ->descriptionIcon('heroicon-o-cog-8-tooth')
                     ->description('Dado da configuração de cautelas')
-                    ->color('success')
+                    ->color('primary')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])
@@ -70,7 +70,7 @@ class GeneralOverview extends BaseWidget
                 Stat::make('Relatório de Auditoria', ModelsActivity::all()->count())
                     ->descriptionIcon('heroicon-m-eye')
                     ->description('Dados de auditoria')
-                    ->color('success')
+                    ->color('primary')
                     ->extraAttributes([
                         'class' => 'cursor-pointer',
                     ])

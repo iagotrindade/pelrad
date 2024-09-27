@@ -22,6 +22,7 @@ use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 
 
 
@@ -47,6 +48,7 @@ class UserResource extends Resource
                 ->schema([
                     FileUpload::make('avatar')
                         ->label('Imagem do Usuário')
+                        ->directory('users')
                         ->imageEditor()
                         ->imageEditorAspectRatios([
                             '16:9',
@@ -59,7 +61,7 @@ class UserResource extends Resource
                 ->schema([
                     Select::make('graduation')
                     ->required()
-                    ->label('Graduação')
+                    ->label('Posto/Graduação')
                     ->live()
                     ->options([
                         'Sd' => 'Soldado',
@@ -102,7 +104,7 @@ class UserResource extends Resource
                 TextColumn::make('graduation')
                     ->searchable()
                     ->sortable()
-                    ->label('Graduação'),
+                    ->label('Posto/Graduação'),
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
@@ -128,8 +130,7 @@ class UserResource extends Resource
             ])
 
             ->actions([
-                ActivityLogTimelineAction::make('Logs'),
-
+                ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->after(function ($record) {
                     $authUser = auth()->user();

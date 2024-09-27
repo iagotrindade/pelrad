@@ -56,7 +56,7 @@ class Material extends Model
         ->setDescriptionForEvent(function(string $eventName) {
             switch ($eventName) {
                 case 'created':
-                    $eventName = 'Este material foi criado';
+                    $eventName = 'Novo material criado';
                     break;
     
                 case 'updated':

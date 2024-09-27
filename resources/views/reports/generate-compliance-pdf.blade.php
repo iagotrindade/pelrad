@@ -107,7 +107,7 @@
         <div class="pdf-container">
             <div class="pdf-header">
                 <div class="header-img-area">
-                    <img class="header-image" src="{{url("storage/panel-assets/eb-logo.png")}}" alt="Exército Brasileiro">
+                    <img class="header-image" src="{{ public_path('storage/panel-assets/eb-logo.png') }}" alt="Exército Brasileiro">
                 </div>
 
                 <p class="header-text">

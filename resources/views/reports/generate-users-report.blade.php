@@ -103,7 +103,7 @@
         <div class="pdf-container">
             <div class="pdf-header">
                 <div class="header-img-area">
-                    <img class="header-image" src="{{url("storage/panel-assets/eb-logo.png")}}" alt="Exército Brasileiro">
+                    <img class="header-image" src="{{ public_path('storage/panel-assets/eb-logo.png') }}" alt="Exército Brasileiro">
                 </div>
 
                 <p class="header-text">
@@ -142,7 +142,12 @@
                                 <td>{{ $loop->iteration }}</td>
 
                                 <td>
-                                    <img class="user-image" src="{{ url('storage/'.$user->avatar.'') }}" alt="Imagem do Usuário"> 
+                                    @if ($user->avatar == null)
+                                        <img class="user-image" src="{{ public_path('storage/panel-assets/default_user.png') }}" alt="Imagem do Usuário"> 
+                                    @else
+                                        <img class="user-image" src="{{ public_path('storage/'.$user->avatar.'') }}" alt="Imagem do Usuário"> 
+                                    @endif
+                                    
                                 </td>
 
                                 <td>

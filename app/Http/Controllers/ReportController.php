@@ -3,17 +3,21 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Loan;
 use App\Models\User;
 use App\Models\Report;
 use App\Models\Category;
 use App\Models\Material;
 use App\Models\Compliance;
+use App\Models\Maintenance;
 use Illuminate\Http\Request;
 use App\Models\Configuration;
-use App\Models\Loan;
-use App\Models\Maintenance;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
+use Filament\Notifications\Notification;
+use Filament\Notifications\Livewire\Notifications;
 
 class ReportController extends Controller
 {
@@ -115,62 +119,54 @@ class ReportController extends Controller
             'file' => $path
         ]);
 
+        $this->registerReport('Pronto - '.strtoupper(Carbon::now()->translatedFormat('d M Y')), 'Pronto - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf');
+
         return $pdf->stream('Pronto - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf');
     }   
 
     public function generateUserReport() {
         $users = User::all();
-
         $name = 'Relatório de usuários - '.strtoupper(Carbon::now()->translatedFormat('d M Y')).'.pdf';
-        $path = '/storage/reports/'.$name.'';
 
-        $pdf = Pdf::loadView('reports.generate-users-report', ['config' => Configuration::find(1), 'users' => $users])->save(public_path().$path);
+        $this->registerReport('Relatório de usuários', $name);
 
-        return $pdf->stream($name);
+        return Pdf::loadView('reports.generate-users-report', ['config' => Configuration::find(1), 'users' => $users])->stream($name);
     }
 
     public function generateCategoriesReport() {
         $categories = Category::all();
-
         $name = 'Relatório de categorias - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
-        $path = '/storage/reports/'.$name.'';
 
-        $pdf = Pdf::loadView('reports.generate-categories-report', ['config' => Configuration::find(1), 'categories' => $categories])->save(public_path().$path);
+        $this->registerReport('Relatório de categorias', $name);
 
-        return $pdf->stream('Relatório de categorias - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf');
+        return Pdf::loadView('reports.generate-categories-report', ['config' => Configuration::find(1), 'categories' => $categories])->stream($name);
     }
 
     public function generateMaterialReport() {
         $materials = Material::all();
-
         $name = 'Relatório de material carga - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
-        $path = '/storage/reports/'.$name.'';
 
-        $pdf = Pdf::loadView('reports.generate-material-report', ['config' => Configuration::find(1), 'materials' => $materials])->setPaper('A4', 'landscape')->save(public_path().$path);
+        $this->registerReport('Relatório de material carga', $name);
 
-        return $pdf->stream($name);
+        return Pdf::loadView('reports.generate-material-report', ['config' => Configuration::find(1), 'materials' => $materials])->setPaper('A4', 'landscape')->stream($name);
     }
 
     public function generateLoansReport() {
         $loans = Loan::all();
-
         $name = 'Relatório de cautelas - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
-        $path = '/storage/reports/'.$name.'';
 
-        $pdf = Pdf::loadView('reports.generate-loans-report', ['config' => Configuration::find(1), 'loans' => $loans])->save(public_path().$path);
+        $this->registerReport('Relatório de cautelas', $name);
 
-        return $pdf->stream($name);
+        return Pdf::loadView('reports.generate-loans-report', ['config' => Configuration::find(1), 'loans' => $loans])->stream($name);
     }
 
     public function generateConfigReport() {
         $configuration = Configuration::all();
-
         $name = 'Relatório de configurações - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
-        $path = '/storage/reports/'.$name.'';
 
-        $pdf = Pdf::loadView('reports.generate-configuration-report', ['config' => Configuration::find(1), 'configuration' => $configuration])->setPaper('A4', 'landscape')->save(public_path().$path);
+        $this->registerReport('Relatório de configurações', $name);
 
-        return $pdf->stream($name);
+        return Pdf::loadView('reports.generate-configuration-report', ['config' => Configuration::find(1), 'configuration' => $configuration])->setPaper('A4', 'landscape')->stream($name);
     }
 
     public function generateAuditReport() {
@@ -194,23 +190,26 @@ class ReportController extends Controller
         }
 
         $name = 'Relatório de atividades dos usuários - '.strtoupper(Carbon::now()->format('d M Y')).'.pdf';
-        $path = '/storage/reports/'.$name;
+
+        $this->registerReport('Relatório de atividades dos usuários', $name);
 
         // Configuração do PDF
-        $pdf = Pdf::loadView('reports.generate-activities-report', [
+        return Pdf::loadView('reports.generate-activities-report', [
             'config' => Configuration::find(1),
             'activities' => $activities
-        ])->setPaper('A4', 'landscape')->save(public_path() . $path);
-
-        return $pdf->stream($name);
+        ])->setPaper('A4', 'landscape')->stream($name);
     }
 
     public static function registerReport($name, $file) {
-        if (file_exists($file)) {
-            Report::create([
-                'name' => $name,
-                'file' => $file
-            ]);
-        }
+        Report::create([
+            'name' => $name,
+            'file' => $file
+        ]);
+
+        Notification::make()
+            ->title('Novo relatório Gerado')
+            ->icon('heroicon-o-clipboard-document-list')
+            ->body(Auth::user()->name . ' gerou um ' . $name . '.')
+        ->sendToDatabase(User::all());
     }
 }

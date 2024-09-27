@@ -15,96 +15,63 @@ class MaterialAvailability extends ChartWidget
 
     protected function getData(): array
     {
-        $activeFilter = $this->filter;
-        $dateFilter = null;
+        // Definir o filtro de data com base no filtro ativo
+        $dateFilter = match ($this->filter) {
+            'today' => Carbon::today(),
+            'week' => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
+            'month' => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+            'year' => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
+            default => null,
+        };
 
-        switch ($activeFilter) {
-            case 'today':
-                $dateFilter = Carbon::today();
-                break;
+        // Query base para todos os materiais
+        $materialQuery = Material::query();
 
-            case 'week':
-                $dateFilter = [
-                    Carbon::now()->startOfWeek(),
-                    Carbon::now()->endOfWeek()
-                ];
-                break;
-
-            case 'month':
-                $dateFilter = [
-                    Carbon::now()->startOfMonth(),
-                    Carbon::now()->endOfMonth()
-                ];
-                break;
-
-            case 'year':
-                $dateFilter = [
-                    Carbon::now()->startOfYear(),
-                    Carbon::now()->endOfYear()
-                    ];
-                break;
-
-            default:
-                $dateFilter = null;
-        }
-
-        // Filtros para materiais
-        $allQuery = Material::query();
-        $availableQuery = Material::query();
-        $unavailableQuery = Material::query();
-        $borrowedQuery = Material::query();
-        $maintenanceQuery = Material::query();
-
-        if ($activeFilter && $dateFilter) {
-            if ($activeFilter == 'today') {
-                $allQuery->whereDate('updated_at', $dateFilter);
-                $availableQuery->whereDate('updated_at', $dateFilter);
-                $unavailableQuery->whereDate('updated_at', $dateFilter);
-                $borrowedQuery->whereDate('updated_at', $dateFilter);
-                $maintenanceQuery->whereDate('updated_at', $dateFilter);
+        // Aplicar filtros de data, se houver
+        if ($dateFilter) {
+            if (is_array($dateFilter)) {
+                $materialQuery->whereBetween('updated_at', $dateFilter);
             } else {
-                $allQuery->whereBetween('updated_at', $dateFilter);
-                $availableQuery->whereBetween('updated_at', $dateFilter);
-                $unavailableQuery->whereBetween('updated_at', $dateFilter);
-                $borrowedQuery->whereBetween('updated_at', $dateFilter);
-                $maintenanceQuery->whereDate('updated_at', $dateFilter);
+                $materialQuery->whereDate('updated_at', $dateFilter);
             }
         }
 
-        $all = $allQuery->count();
-        $available = $availableQuery->where('status', 'Disponível')->count();
-        $unavailable = $unavailableQuery->where('status', 'Indisponível')->count();
-        $borrowed = $borrowedQuery->where('status', 'Cautelado')->count();
-        $maintenance = $maintenanceQuery->where('status', 'Manutenção')->count();
+        // Clonar as queries antes de aplicar filtros de status
+        $allQuery = clone $materialQuery;
+        $availableQuery = clone $materialQuery;
+        $unavailableQuery = clone $materialQuery;
+        $borrowedQuery = clone $materialQuery;
+        $maintenanceQuery = clone $materialQuery;
 
+        // Contagens com base no status
+        $statusCounts = [
+            'Todos' => $allQuery->count(),
+            'Disponível' => $availableQuery->where('status', 'Disponível')->count(),
+            'Indisponível' => $unavailableQuery->where('status', 'Indisponível')->count(),
+            'Cautelado' => $borrowedQuery->where('status', 'Cautelado')->count(),
+            'Manutenção' => $maintenanceQuery->where('status', 'Manutenção')->count(),
+        ];
 
         return [
-            'labels' => [
-                'Todos',
-                'Disponível',
-                'Indisponível',
-                'Cautelado',
-                'Manutenção',
-            ],
-
+            'labels' => array_keys($statusCounts),
             'datasets' => [
                 [
                     'label' => 'Disponibilidade de Material',
-                    'data' => [$all, $available, $unavailable, $borrowed, $maintenance],
+                    'data' => array_values($statusCounts),
                     'backgroundColor' => 'rgb(56, 189, 248)',
                     'borderColor' => '#9BD0F5',
                     'backgroundColor' => [
-                        '#081c15',
-                        '#1b4332',
-                        '#2d6a4f',
-                        '#40916c',
-                        '#52b788',
-                      ],
-
+                        '#179bef',
+                        '#3bb4f3',
+                        '#5ecdf7',
+                        '#82e5fb',
+                        '#a5feff',
+                    ],
                 ],
             ],
         ];
     }
+
 
     protected function getType(): string
     {

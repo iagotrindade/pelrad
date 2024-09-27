@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('frequency');
             $table->string('alternative_frequency');
             $table->longText('stations_data');
+            $table->string('drr_quantity');
             $table->string('file');
             $table->timestamps();
         });

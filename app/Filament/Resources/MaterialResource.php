@@ -9,30 +9,37 @@ use App\Models\Category;
 use App\Models\Material;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Support\RawJs;
 use Filament\Resources\Resource;
 use Filament\Actions\RestoreAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
+use Filament\Resources\Components\Tab;
 use Filament\Support\Enums\FontWeight;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextArea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\MaterialExporter;
+use App\Filament\Imports\MaterialImporter;
 use Filament\Notifications\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Illuminate\Validation\ValidationException;
 use App\Filament\Resources\MaterialResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
 use App\Filament\Resources\MaterialResource\RelationManagers;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\RestoreBulkAction;
-use Illuminate\Validation\ValidationException;
-use Filament\Resources\Components\Tab;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
+
 
 class MaterialResource extends Resource
 {
@@ -55,16 +62,18 @@ class MaterialResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\FileUpload::make('images')
-                                ->image()
-                                ->label('Imagens')
-                                ->multiple()
-                                ->reorderable()
-                                ->maxFiles(5)
-                                ->imageEditor(),
+                            ->image()
+                            ->label('Imagens')
+                            ->multiple()
+                            ->reorderable()
+                            ->maxFiles(5)
+                            ->imageEditor()
+                            ->directory('materials')
+                            ->panelLayout('grid'),
                     ]),
                 Forms\Components\Section::make()
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Nome')
                             ->required(),
 
@@ -73,30 +82,32 @@ class MaterialResource extends Resource
                             ->searchable()
                             ->options(Category::all()->pluck('name', 'id')),
 
-                        Forms\Components\TextInput::make('serial_number')
+                        TextInput::make('serial_number')
                             ->label('Nr de Serie')
                             ->required(),
 
-                        Forms\Components\TextArea::make('description')
+                        TextArea::make('description')
                             ->label('Descrição')
                             ->required(),
 
-                        Forms\Components\TextInput::make('record_number')
+                        TextInput::make('record_number')
                             ->label('Nr da Ficha'),
 
-                        Forms\Components\TextInput::make('patrimony_number')
+                        TextInput::make('patrimony_number')
                             ->label('Nr de Patrimônio'),
 
-                        Forms\Components\TextInput::make('patrimony_value')
-                            ->label('Valor de Patrimônio'),
+                                                
+                        TextInput::make('patrimony_value')
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(','),
 
-                        Forms\Components\TextInput::make('inclusion_document')
+                        TextInput::make('inclusion_document')
                             ->label('Boletim de Inclusão'),
 
-                        Forms\Components\DatePicker::make('inclusion_date')
+                        DatePicker::make('inclusion_date')
                             ->label('Data de Inclusão'),
 
-                        Forms\Components\Select::make('status')
+                        Select::make('status')
                             ->options([
                                 'Disponível' => 'Disponível',
                                 'Indisponível' => 'Indisponível',
@@ -117,13 +128,15 @@ class MaterialResource extends Resource
     {
         return $table
             ->headerActions([
+                ImportAction::make()
+                    ->importer(MaterialImporter::class),
                 ExportAction::make()
                     ->exporter(MaterialExporter::class),
             ])
             ->columns([
                 Tables\Columns\ImageColumn::make('images')
-                ->circular()
-                ->label('Imagens'),
+                    ->circular()
+                    ->label('Imagens'),
 
                 Tables\Columns\TextColumn::make('serial_number')
                     ->searchable()
@@ -175,13 +188,13 @@ class MaterialResource extends Resource
 
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                ActivityLogTimelineAction::make('Logs'),
+                ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->before(function ($record) {
                     $authUser = auth()->user();
                     $recipients = User::all();
 
-                    if($record->components->isNotEmpty()) {
+                    if($record->components && $record->components->isNotEmpty()) {
                         return;
                     }
 
