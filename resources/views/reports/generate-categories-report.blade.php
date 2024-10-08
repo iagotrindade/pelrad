@@ -127,7 +127,7 @@
                             <th>ORD</th>
                             <th>NOME</th>
                             <th>NÚMERO DE EQUIPAMENTOS</th>
-                            <th>CRIADO EM</th>
+                            <th>ÚLTIMA ALTERAÇÃO EM</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -148,7 +148,7 @@
                                 </td>
 
                                 <td>
-                                    {{ Str::upper(Carbon\Carbon::parse($category->created_at)->translatedFormat('d \d\e F \d\e Y \à\s H:m')) }}
+                                    {{ Str::upper(Carbon\Carbon::parse($category->updated_at)->translatedFormat('d \d\e F \d\e Y \à\s H:m')) }}
                                 </td>
                             </tr>
                         @endforeach

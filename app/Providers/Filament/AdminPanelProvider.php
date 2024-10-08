@@ -43,6 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => '#179bef',
             ])
+            ->favicon('storage/panel-assets/favicon.png')
             ->profile(isSimple: false)
             ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
@@ -60,7 +61,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-presentation-chart-line')
                     ->sort(6),
                 NavigationItem::make('Orientações')
-                    ->url('/storage/oracle/repository/orientation.pdf', shouldOpenInNewTab: true)
+                    ->url('/storage/panel-assets/orientation.pdf', shouldOpenInNewTab: true)
                     ->icon('heroicon-o-book-open')
                     ->group('Ferramentas')
                     ->sort(2)

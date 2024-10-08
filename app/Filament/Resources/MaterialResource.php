@@ -13,6 +13,7 @@ use Filament\Support\RawJs;
 use Filament\Resources\Resource;
 use Filament\Actions\RestoreAction;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Components\Tab;
 use Filament\Support\Enums\FontWeight;
@@ -87,18 +88,17 @@ class MaterialResource extends Resource
                             ->required(),
 
                         TextArea::make('description')
-                            ->label('Descrição')
-                            ->required(),
+                            ->label('Descrição'),
 
                         TextInput::make('record_number')
                             ->label('Nr da Ficha'),
 
                         TextInput::make('patrimony_number')
                             ->label('Nr de Patrimônio'),
-
-                                                
+      
                         TextInput::make('patrimony_value')
                             ->mask(RawJs::make('$money($input)'))
+                            ->label('Valor de Patrimônio')
                             ->stripCharacters(','),
 
                         TextInput::make('inclusion_document')
@@ -191,7 +191,7 @@ class MaterialResource extends Resource
                 ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->before(function ($record) {
-                    $authUser = auth()->user();
+                    $authUser = Auth::user();
                     $recipients = User::all();
 
                     if($record->components && $record->components->isNotEmpty()) {
@@ -205,7 +205,16 @@ class MaterialResource extends Resource
                     ->sendToDatabase($recipients);
                 }),
 
-                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\RestoreAction::make()->before(function ($record) {
+                    $authUser = Auth::user();
+                    $recipients = User::all();
+
+                    Notification::make()
+                        ->title('Material restaurado')
+                        ->icon('heroicon-o-cube') 
+                        ->body($authUser->name . ' restaurou o material ' . $record->name . '.')
+                    ->sendToDatabase($recipients);
+                }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

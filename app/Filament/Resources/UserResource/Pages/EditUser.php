@@ -4,6 +4,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Models\User;
 use Filament\Actions;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use App\Filament\Resources\UserResource;
 use Filament\Notifications\Notification;
@@ -19,14 +20,20 @@ class EditUser extends EditRecord
 
     public function __construct()
     {
-        $this->authUser = auth()->user();
+        $this->authUser = Auth::user();
         $this->recipients = User::all();
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        if($data['avatar'] !== $record->avatar) {
+            if (file_exists(public_path('storage/'.$record->avatar.''))) {
+                unlink(public_path('storage/'.$record->avatar.''));
+            }
+        }   
         $record->update($data);
 
+        
         Notification::make()
             ->title('Usuário modificado')
             ->icon('heroicon-o-user-group')
@@ -46,6 +53,15 @@ class EditUser extends EditRecord
     {
         return [
             Actions\DeleteAction::make()->after(function ($record) {
+                $userImage = 'storage/'.$record->avatar.'';
+                
+                if($userImage) {
+                    // Verificar se o arquivo existe antes de tentar excluir
+                    if (file_exists(public_path($userImage))) {
+                        unlink(public_path($userImage));
+                    }
+                }
+
                 Notification::make()
                     ->title('Usuário deletado')
                     ->icon('heroicon-o-user-group')

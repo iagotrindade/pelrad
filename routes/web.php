@@ -1,7 +1,12 @@
 <?php
 
+use GuzzleHttp\Client;
+use App\Models\Material;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
+use App\Models\Maintenance;
+use App\Models\User;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('gerar/pronto', [ReportController::class, 'generateComplianceReport'])->name('report.compliance');
@@ -20,7 +25,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('teste', function () {
-    return view('reports.generate-compliance-pdf');
+    
 });
 
 

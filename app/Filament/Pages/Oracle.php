@@ -28,5 +28,12 @@ class Oracle extends Page
                 ->url('update-oracles/create'),
         ];
     }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\UpdateOracleResource\Widgets\OracleLearnCurve::class,
+        ];
+    }
 }
 

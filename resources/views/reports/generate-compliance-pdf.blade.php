@@ -161,74 +161,76 @@
                 </table>
             </div>
 
-            <div class="page-break"></div>
+            @if (!empty($maintenanceMaterials) || !empty($maintenanceMaterials))
+                <div class="page-break"></div>
 
-            <div class="header-report-title">
-                <h1>DISTRIBUIÇÃO DE EQUIPAMENTO RÁDIO EM DESTINO</h1>
-            </div>
+                <div class="header-report-title">
+                    <h1>DISTRIBUIÇÃO DE EQUIPAMENTO RÁDIO EM DESTINO</h1>
+                </div>
 
-            <div class="material-list">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>MATERIAL</th>
-                            <th>DESTINO</th>
-                            <th>QUANTIDADE</th>
-                            <th>OM</th>
-                        </tr>
-                    </thead>
+                <div class="material-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>MATERIAL</th>
+                                <th>DESTINO</th>
+                                <th>QUANTIDADE</th>
+                                <th>OM</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        @if (!empty($maintenanceMaterials))
-                            @foreach($maintenanceMaterials as $index => $maintenance)
-                                <tr>    
-                                    <td>
-                                        {{ Str::upper($maintenance['material']->name) }}
-                                    </td>
-                                    
-                                    @if ($index == 0)
-                                        <td rowspan="{{ count($maintenanceMaterials) }}">
-                                            MANUTENÇÃO
+                        <tbody>
+                            @if (!empty($maintenanceMaterials))
+                                @foreach($maintenanceMaterials as $index => $maintenance)
+                                    <tr>    
+                                        <td>
+                                            {{ Str::upper($maintenance['material']->name) }}
                                         </td>
-                                    @endif
+                                        
+                                        @if ($index == 0)
+                                            <td rowspan="{{ count($maintenanceMaterials) }}">
+                                                MANUTENÇÃO
+                                            </td>
+                                        @endif
 
-                                    <td>
-                                        1
-                                    </td>
+                                        <td>
+                                            1
+                                        </td>
 
-                                    <td>
-                                        {{ Str::upper($maintenance['maintenance']->destiny)}}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
-                        
-                        @if (!empty($loansWithDetails))
-                            @foreach($loansWithDetails as $name => $loan)
-                                <tr>    
-                                    <td>
-                                        {{ Str::upper($name) }}
-                                    </td>
-                                    
-
-                                    <td>
-                                        {{ Str::upper($loan['to']) }}
-                                    </td>
-
-                                    <td>
-                                        {{ Str::upper($loan['count']) }}
-                                    </td>
-
-                                    <td>
-                                        {{ Str::upper($loan['om']) }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
+                                        <td>
+                                            {{ Str::upper($maintenance['maintenance']->destiny)}}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
                             
-                    </tbody>
-                </table>
-            </div>
+                            @if (!empty($loansWithDetails))
+                                @foreach($loansWithDetails as $name => $loan)
+                                    <tr>    
+                                        <td>
+                                            {{ Str::upper($name) }}
+                                        </td>
+                                        
+
+                                        <td>
+                                            {{ Str::upper($loan['to']) }}
+                                        </td>
+
+                                        <td>
+                                            {{ Str::upper($loan['count']) }}
+                                        </td>
+
+                                        <td>
+                                            {{ Str::upper($loan['om']) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                                
+                        </tbody>
+                    </table>
+                </div>
+            @endif
 
             <div class="pdf-date-info">
                 <p>Quartel em Porto Alegre – RS, {{Carbon\Carbon::now()->translatedFormat('d \d\e F \d\e Y')}}</p>

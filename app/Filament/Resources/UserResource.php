@@ -8,6 +8,7 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
@@ -133,8 +134,17 @@ class UserResource extends Resource
                 ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->after(function ($record) {
-                    $authUser = auth()->user();
+                    $authUser = Auth::user();
                     $recipients = User::all();
+
+                    $userImage = 'storage/'.$record->avatar.'';
+            
+                    if($userImage) {
+                        // Verificar se o arquivo existe antes de tentar excluir
+                        if (file_exists(public_path($userImage))) {
+                            unlink(public_path($userImage));
+                        }
+                    }
 
                     Notification::make()
                         ->title('Usuário deletado')

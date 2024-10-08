@@ -14,15 +14,29 @@ class MaterialImporter extends Importer
     public static function getColumns(): array
     {
         return [
+            ImportColumn::make('record_number')
+                ->rules(['max:255']),
+            ImportColumn::make('patrimony_number')
+                ->rules(['max:255']),
+            ImportColumn::make('patrimony_value')
+                ->rules(['max:255']),
+            ImportColumn::make('inclusion_document')
+                ->rules(['max:255']),
+            ImportColumn::make('inclusion_date')
+                ->rules(['datetime']),
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
             ImportColumn::make('serial_number')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
+            ImportColumn::make('description'),
             ImportColumn::make('status')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
+            ImportColumn::make('categories_id')
+                ->numeric()
+                ->rules(['integer']),
         ];
     }
 
@@ -38,10 +52,10 @@ class MaterialImporter extends Importer
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your material import has completed and ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+        $body = 'Sua importação de material foi completada e ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' importadas.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' falha ao importar.';
         }
 
         return $body;

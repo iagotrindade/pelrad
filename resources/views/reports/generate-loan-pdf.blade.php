@@ -174,6 +174,7 @@
             </div>
 
             <div class="pdf-devolution-info">
+                <br>
                 <p>2. Data prevista para devolução do material: {{Carbon\Carbon::createFromFormat('Y-m-d', $data['return_date'])->translatedFormat('d \d\e F \d\e Y')}}</p>
                 <p>3. O material deverá ser entregue manutenido e em horário de expediente.</p>
                 <p>4. O material não deve ser recautelado para outras OM’s.</p>

@@ -87,14 +87,19 @@ class LoanResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('from')
-                    ->searchable()
-                    ->label('De:'),
                 TextColumn::make('to')
                     ->searchable()
-                    ->label('Para:'),
+                    ->label('OM:'),
                 TextColumn::make('status')
                     ->searchable(),
+                TextColumn::make('return_date')
+                    ->dateTime()
+                    ->label('Devolução em')
+                    ->formatStateUsing(function ($state) {
+                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
+                    })
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Criado em:')
                     ->formatStateUsing(function ($state) {
@@ -113,7 +118,7 @@ class LoanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('download')
                     ->label('PDF')
-                    ->url(fn (Loan $record): string => 'http://filament-app.test/storage/'.$record->file.'')
+                    ->url(fn (Loan $record): string => 'http://pelrad.app/storage/'.$record->file.'')
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->openUrlInNewTab()
@@ -199,6 +204,11 @@ class LoanResource extends Resource
                         TextEntry::make('contact')
                             ->url(fn (Loan $record): string => 'https://wa.me/55'.str_replace(['(', ')', '-', ' '], '', $record->contact).'', shouldOpenInNewTab: true)
                             ->label('Contato'),
+                        TextEntry::make('created_at')
+                            ->label('Data da cautela')
+                            ->formatStateUsing(function ($state) {
+                                return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
+                            }), 
                         TextEntry::make('return_date')
                             ->label('Previsão de retorno')
                             ->formatStateUsing(function ($state) {
@@ -215,7 +225,6 @@ class LoanResource extends Resource
                             ->label('')
                             ->minHeight('80svh'),
                     ]),
-
                 \Filament\Infolists\Components\Section::make('Cautela Assinada')
                     ->description('Inserida no sistema após assinatura')
                     ->collapsible()
