@@ -128,7 +128,7 @@
 
             <div class="header-personal-data">
                 <h1>Cautela de Material da {{$config->company}}</h1>
-                <p>1 .Declaro para os fins legais que eu, {{$data['name']}}, do {{$data['to']}}, recebi do Aux do Pel Rd da {{$config->company}}, do {{$config->organization_slug}} o material abaixo relacionado:</p>
+                <p>1 .Declaro para os fins legais que eu, {{$data['name']}}, do {{$data['to']}}, recebi do Aux do {{$config->squad}} da {{$config->company}}, do {{$config->organization_slug}} o material abaixo relacionado:</p>
             </div>
 
             <div class="pdf-table">

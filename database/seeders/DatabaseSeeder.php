@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
         Configuration::factory()->create([
             'organization' => "3º BATALHÃO DE COMUNICAÇÕES E GUERRA ELETRÔNICA",
             'organization_slug' => "3º B Com GE",
-            'company' => "CCPCR",
+            'company' => "CIA COM",
             'squad' => "PELOTÃO RÁDIO",
             'squad_leader' => "CÉSAR AUGUSTO DOS SANTOS - 2º Ten",
             'company_leader' => "MIGUEL DOS ANJOS - CAP",
