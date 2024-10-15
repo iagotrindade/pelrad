@@ -32,22 +32,10 @@ class ConsultOracle extends Component
         $this->greetingMsg = Session::has('conversation_history') 
             ? '' 
             : 'Olá! Me faça uma pergunta.';
-
-        return view('livewire.consult-oracle');
-    }
-
-    public function mount() {
+            
         $this->repository = Oracle::all();
 
-        $this->iaData = [
-            'urlDaAplicação' => 'https://pelrad.app/',
-            'atividades' => Activity::select('description', 'event', 'created_at')->get(),
-            'materiais' => Material::select('name', 'description', 'status', 'categories_id')->with(['type:id,name'])->get(),
-            'usuarios' => User::select('graduation', 'name', 'email')->get(),
-            'cautelas' => Loan::select('to', 'graduation', 'name', 'contact', 'status', 'materials_info', 'return_date')->get(),
-            'manutencoes' => Maintenance::select('status', 'destiny', 'created_at', 'file')->get(),
-            'prontos' => Compliance::select('name', 'created_at')->get()
-        ];
+        return view('livewire.consult-oracle');
     }
 
     public function changeModel() {
@@ -59,9 +47,6 @@ class ConsultOracle extends Component
             $this->dispatch('minPromtLenght');
             return; // Termina a função até o prompt estar completo
         }
-        $this->validate([
-            'prompt' => 'required|min:15',
-        ]);
 
         // Realiza a consulta dependendo do estado do model
         $method = ($this->model == 'offline') ? 'offlineConsult' : 'onlineConsult';
@@ -95,6 +80,16 @@ class ConsultOracle extends Component
     }
 
     public function onlineConsult() {
+        $this->iaData = [
+            'urlDaAplicação' => 'https://pelrad.app/',
+            'atividades' => Activity::select('description', 'event', 'created_at')->get(),
+            'materiais' => Material::select('name', 'description', 'status', 'categories_id')->with(['type:id,name'])->get(),
+            'usuarios' => User::select('graduation', 'name', 'email')->get(),
+            'cautelas' => Loan::select('to', 'graduation', 'name', 'contact', 'status', 'materials_info', 'return_date')->get(),
+            'manutencoes' => Maintenance::select('status', 'destiny', 'created_at', 'file')->get(),
+            'prontos' => Compliance::select('name', 'created_at')->get()
+        ];
+        
         $this->result = 'Pesquisando...';
         // Retrieve conversation history from session
         $history = $this->getSessionHistory();
@@ -122,7 +117,7 @@ class ConsultOracle extends Component
             'json' => [
                 'message' => $context . "\nPergunta: " . $this->prompt . "\nResposta:",
                 'model' => 'command-r-08-2024',
-                'preamble' => 'Seu nome é "Antigão" e foi desenvolvido pelo 3º Sgt Iago Silva. Você possuí conhecimento sobre todas informações do sistema. Caso não encontre nas o que o usuário pede nas informações fornecidas, deve pesquisar o que não encontrar na internet. Você é treinado para ajudar os usuários, fornecendo respostas completas e úteis às suas dúvidas. Lembre-se que suas respostas devem ser sempre completas e o mais detalhadas possíveis'
+                'preamble' => 'Seu nome é "Antigão" e foi desenvolvido pelo 3º Sgt Iago Silva. Você possuí conhecimento sobre todas informações do sistema. Sempre que não souber a respsota deve pesquisar o que não encontrar na internet. Você é treinado para ajudar os usuários, fornecendo respostas completas e úteis às suas dúvidas. Lembre-se que suas respostas devem ser sempre completas e o mais detalhadas possíveis'
             ]
         ]);
 
