@@ -13,6 +13,7 @@ use App\Filament\Pages\Settings;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationItem;
+use App\Http\Middleware\SecurityHeaders;
 use Filament\Navigation\NavigationGroup;
 use Filament\Http\Middleware\Authenticate;
 use Rmsramos\Activitylog\ActivitylogPlugin;
@@ -96,6 +97,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                
             ]);
     }
 }

@@ -11,9 +11,15 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable, LogsActivity;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+    }
+
 
     /**
      * The attributes that are mass assignable.

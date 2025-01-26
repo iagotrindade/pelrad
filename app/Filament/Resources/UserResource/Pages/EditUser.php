@@ -26,14 +26,16 @@ class EditUser extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        if($data['avatar'] !== $record->avatar) {
-            if (file_exists(public_path('storage/'.$record->avatar.''))) {
-                unlink(public_path('storage/'.$record->avatar.''));
+        if (!empty($record->avatar) && $data['avatar'] !== $record->avatar) {
+            $filePath = public_path('storage/' . $record->avatar);
+        
+            if (file_exists($filePath) && is_file($filePath)) {
+                unlink($filePath);
             }
-        }   
+        }
+
         $record->update($data);
 
-        
         Notification::make()
             ->title('Usuário modificado')
             ->icon('heroicon-o-user-group')

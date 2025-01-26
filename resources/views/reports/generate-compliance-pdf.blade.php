@@ -161,7 +161,7 @@
                 </table>
             </div>
 
-            @if (!empty($maintenanceMaterials) || !empty($maintenanceMaterials))
+            @if (!empty($maintenanceMaterials) || !empty($loansWithDetails))
                 <div class="page-break"></div>
 
                 <div class="header-report-title">

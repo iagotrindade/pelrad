@@ -133,18 +133,18 @@ class UserResource extends Resource
             ->actions([
                 ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()->after(function ($record) {
+                Tables\Actions\DeleteAction::make()->before(function ($record) {
                     $authUser = Auth::user();
                     $recipients = User::all();
 
-                    $userImage = 'storage/'.$record->avatar.'';
+                    /* $userImage = 'storage/'.$record->avatar.'';
             
                     if($userImage) {
                         // Verificar se o arquivo existe antes de tentar excluir
                         if (file_exists(public_path($userImage))) {
                             unlink(public_path($userImage));
                         }
-                    }
+                    }*/
 
                     Notification::make()
                         ->title('Usuário deletado')

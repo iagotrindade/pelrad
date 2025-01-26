@@ -1,12 +1,13 @@
 <?php
 
+use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Material;
+use App\Models\Maintenance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
-use App\Models\Maintenance;
-use App\Models\User;
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('gerar/pronto', [ReportController::class, 'generateComplianceReport'])->name('report.compliance');
@@ -22,10 +23,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('gerar/relatorio/configuracoes', [ReportController::class, 'generateConfigReport'])->name('report.configuration');
 
     Route::get('gerar/relatorio/auditoria', [ReportController::class, 'generateAuditReport'])->name('report.audit');
-});
-
-Route::get('teste', function () {
-    
 });
 
 
