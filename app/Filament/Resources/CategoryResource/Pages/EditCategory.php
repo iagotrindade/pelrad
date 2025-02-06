@@ -26,7 +26,9 @@ class EditCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->after(function ($record) {
+            Actions\DeleteAction::make()->before(function ($record) {
+                $record->components()->delete();
+
                 Notification::make()
                     ->title('Categoria deletada')
                     ->icon('heroicon-o-tag')

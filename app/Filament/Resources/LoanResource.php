@@ -118,7 +118,7 @@ class LoanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('download')
                     ->label('PDF')
-                    ->url(fn (Loan $record): string => 'http://pelrad.app/storage/'.$record->file.'')
+                    ->url(fn (Loan $record): string => url('storage/'.$record->file))
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->openUrlInNewTab()

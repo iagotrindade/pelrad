@@ -91,7 +91,7 @@ class MaintenanceResource extends Resource
                     ->schema([                
                         FileUpload::make('file')
                             ->label('Arquivo')
-                            ->directory('maintenance-files')
+                            ->directory('maintenance_files')
                             ->acceptedFileTypes(['application/pdf']),
                     ])
             ]);
@@ -114,7 +114,7 @@ class MaintenanceResource extends Resource
 
                 TextColumn::make('download')
                     ->label('Arquivo')
-                    ->url(fn (Maintenance $record): string => 'http://filament-app.test/'.$record->file.'')
+                    ->url(fn (Maintenance $record): string => url('storage/'.$record->file))
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->limit(50)

@@ -29,7 +29,7 @@ class OracleKnowledge extends BaseWidget
             ->headerActions([
                 Action::make('orientation')
                     ->label('Ver Orientações')
-                    ->url('http://filament-app.test/storage/oracle/repository/orientation.pdf', shouldOpenInNewTab: true)
+                    ->url(url('/storage/oracle/repository/orientation.pdf'), shouldOpenInNewTab: true)
             ])
             ->columns([
                 TextColumn::make('question')

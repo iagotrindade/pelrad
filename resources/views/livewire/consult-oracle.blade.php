@@ -24,7 +24,7 @@
                             
                         <div class="w-full flex items-start">
                             <div class="">
-                                <img class="w-10 h-10" src="{{url('storage/panel-assets/oracle_bot.png')}}" alt="Oráculo">
+                                <img class="w-10 h-10" src="{{url('storage/panel_assets/oracle_bot.png')}}" alt="Oráculo">
                             </div>
                             
                             <div style="max-width: 90%;">
@@ -39,7 +39,7 @@
             @else
                 <div class="w-full flex items-start">
                     <div class="">
-                        <img class="w-10 h-10" src="{{url('storage/panel-assets/oracle_bot.png')}}" alt="Oráculo">
+                        <img class="w-10 h-10" src="{{url('storage/panel_assets/oracle_bot.png')}}" alt="Oráculo">
                     </div>
                     
                     <div style="max-width: 90%;">
@@ -53,7 +53,7 @@
 
         <select class="border-none bg-white shadow-sm bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 rounded-md w-full ps-3 pe-3" wire:change="changeModel" style="margin-top: 20px;">
             <option value="offline">Offline</option>
-            <option value="online">Online</option>
+            <option selected value="online">Online</option>
         </select>
 
         <div class="flex">

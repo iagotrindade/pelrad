@@ -118,7 +118,7 @@ class NetworkResource extends Resource
                 ->sortable(),
             TextColumn::make('download')
                 ->label('PDF')
-                ->url(fn (Network $record): string => 'http://filament-app.test/'.$record->file.'')
+                ->url(fn (Network $record): string => url('storage/'.$record->file))
                 ->default('Download')
                 ->icon('heroicon-m-arrow-down-tray')
                 ->openUrlInNewTab()

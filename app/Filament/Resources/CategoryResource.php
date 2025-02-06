@@ -114,9 +114,11 @@ class CategoryResource extends Resource
             ->actions([
                 ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()->after(function ($record) {
+                Tables\Actions\DeleteAction::make()->before(function ($record) {
                     $authUser = auth()->user();
                     $recipients = User::all();
+
+                    $record->components()->delete();
 
                     Notification::make()
                         ->title('Categoria deletada')

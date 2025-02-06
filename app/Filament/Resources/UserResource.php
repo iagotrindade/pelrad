@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
@@ -46,53 +47,55 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make()
-                ->schema([
-                    FileUpload::make('avatar')
-                        ->label('Imagem do Usuário')
-                        ->directory('users')
-                        ->imageEditor()
-                        ->imageEditorAspectRatios([
-                            '16:9',
-                            '4:3',
-                            '1:1',
-                        ])
-                        ->circleCropper(),
-                        ]),
-                Forms\Components\Section::make()
-                ->schema([
-                    Select::make('graduation')
-                    ->required()
-                    ->label('Posto/Graduação')
-                    ->live()
-                    ->options([
-                        'Sd' => 'Soldado',
-                        'Cb' => 'Cabo',
-                        '3º Sgt' => '3º SGT',
-                        '2º Sgt' => '2º SGT',
-                        '1º Sgt' => '1º SGT',
-                        'Sub' => 'Subtenente',
-                        '2º Ten' => '2º Tenente',
-                        '1º Ten' => '1º Tenente',
-                        'Cap' => 'Capitão',
-                        'Major' => 'Major',
-                        'Ten Cel' => 'Tenente Coronel',
-                        'Cel' => 'Coronel',
+                    ->schema([
+                        FileUpload::make('avatar')
+                            ->label('Imagem do Usuário')
+                            ->directory('users')
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->circleCropper(),
                     ]),
-                    
-                    TextInput::make('name')
-                        ->label('Nome')
-                        ->required(),
+                Forms\Components\Section::make()
+                    ->schema([
+                        Select::make('graduation')
+                            ->required()
+                            ->label('Posto/Graduação')
+                            ->live()
+                            ->options([
+                                'Sd' => 'Soldado',
+                                'Cb' => 'Cabo',
+                                '3º Sgt' => '3º SGT',
+                                '2º Sgt' => '2º SGT',
+                                '1º Sgt' => '1º SGT',
+                                'Sub' => 'Subtenente',
+                                '2º Ten' => '2º Tenente',
+                                '1º Ten' => '1º Tenente',
+                                'Cap' => 'Capitão',
+                                'Major' => 'Major',
+                                'Ten Cel' => 'Tenente Coronel',
+                                'Cel' => 'Coronel',
+                            ]),
 
-                    TextInput::make('email')
-                        ->label('Email')
-                        ->email()
-                        ->required(),
+                        TextInput::make('name')
+                            ->label('Nome')
+                            ->required(),
 
-                    TextInput::make('password')
-                        ->label('Senha')
-                        ->password()
-                        ->required(),
-                ])->columns(2),
+                        TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required(),
+
+                        TextInput::make('password')
+                            ->label('Senha')
+                            ->password()
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                            ->dehydrated(fn($state) => filled($state))
+                            ->required(fn (string $context): bool => $context === 'create')
+                    ])->columns(2),
             ]);
     }
 
@@ -126,9 +129,7 @@ class UserResource extends Resource
                     ->sortable()
             ])
 
-            ->filters([
-                
-            ])
+            ->filters([])
 
             ->actions([
                 ActivityLogTimelineTableAction::make('Logs'),
@@ -137,22 +138,22 @@ class UserResource extends Resource
                     $authUser = Auth::user();
                     $recipients = User::all();
 
-                    /* $userImage = 'storage/'.$record->avatar.'';
-            
-                    if($userImage) {
+                    $userImage = 'storage/' . $record->avatar . '';
+
+                    if ($userImage) {
                         // Verificar se o arquivo existe antes de tentar excluir
                         if (file_exists(public_path($userImage))) {
                             unlink(public_path($userImage));
                         }
-                    }*/
+                    }
 
                     Notification::make()
                         ->title('Usuário deletado')
                         ->icon('heroicon-o-user-group')
                         ->body($authUser->name . ' deletou o usuário ' . $record->name . '.')
-                    ->sendToDatabase($recipients);
+                        ->sendToDatabase($recipients);
                 }),
-            
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -168,9 +169,7 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            
-        ];
+        return [];
     }
 
     public static function getPages(): array

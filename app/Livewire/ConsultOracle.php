@@ -21,7 +21,7 @@ use GuzzleHttp\Exception\RequestException;
 class ConsultOracle extends Component
 {
     public $iaData = [];
-    public $model = 'offline';
+    public $model = 'online';
     public $prompt = '';
     public $greetingMsg;
     public $result;

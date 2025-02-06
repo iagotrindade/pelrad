@@ -9,6 +9,7 @@ use Filament\Widgets;
 use Widgets\DevInfoWidget;
 use Filament\PanelProvider;
 use Filament\Actions\Action;
+use Filament\Enums\ThemeMode;
 use App\Filament\Pages\Settings;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
@@ -41,10 +42,11 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->emailVerification()
+            ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'primary' => '#179bef',
             ])
-            ->favicon('storage/panel-assets/favicon.png')
+            ->favicon('storage/panel_assets/favicon.png')
             ->profile(isSimple: false)
             ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
@@ -62,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-presentation-chart-line')
                     ->sort(6),
                 NavigationItem::make('Orientações')
-                    ->url('/storage/panel-assets/orientation.pdf', shouldOpenInNewTab: true)
+                    ->url('/storage/panel_assets/orientation.pdf', shouldOpenInNewTab: true)
                     ->icon('heroicon-o-book-open')
                     ->group('Ferramentas')
                     ->sort(2)
@@ -97,7 +99,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                
             ]);
     }
 }

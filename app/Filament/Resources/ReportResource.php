@@ -55,7 +55,7 @@ class ReportResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('download')
                     ->label('PDF')
-                    ->url(fn (Compliance $record): string => 'http://filament-app.test/'.$record->file.'')
+                    ->url(fn (Compliance $record): string => url($record->file))
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->openUrlInNewTab(),
