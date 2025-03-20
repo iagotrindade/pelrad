@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('maintenances', function (Blueprint $table) {
             $table->id();
             $table->longText('materials');
-            $table->string('old_info');
+            $table->longText('old_info');
             $table->string('description');
             $table->string('status');
             $table->string('destiny');

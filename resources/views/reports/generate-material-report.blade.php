@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <link rel="icon" type="image/x-icon" href="{{ public_path('storage/panel_assets/eb-logo.png') }}">
         <title>Relatório de material carga {{$config->squad . ' ' . $config->company}}</title>
     </head>
     <body>
@@ -152,7 +153,7 @@
                                     @if (!empty($material->images[0]))
                                         <img class="material-image" src="{{ public_path('storage/'.$material->images[0].'') }}" alt="Imagem do Material">
                                     @else 
-                                        <img class="material-image" src="{{ public_path('storage/panel_assets/material_placeholder.png') }}" alt="Imagem do Material">
+                                        <img class="material-image" src="{{ public_path('storage/panel_assets/material_placeholder.jpg') }}" alt="Imagem do Material">
                                     @endif
                                     
 

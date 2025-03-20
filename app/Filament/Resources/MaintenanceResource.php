@@ -61,12 +61,29 @@ class MaintenanceResource extends Resource
                         Select::make('materials')
                             ->required()
                             ->label('Materiais')
+                            ->preload()
                             ->multiple()
-                            ->getSearchResultsUsing(fn (string $search): array => Material::where('name', 'like', "%{$search}%")
-                            ->whereNot(function (Builder $query) {
-                                $query->where('status', 'Cautelado');
-                            })->pluck('name', 'id')->toArray())
-                            ->getOptionLabelsUsing(fn (array $values): array => Material::whereIn('id', $values)->pluck('name', 'id')->toArray()),
+                            ->getSearchResultsUsing(
+                                fn(string $search): array =>
+                                Material::whereNot(function (Builder $query) {
+                                    $query->where('status', 'Cautelado');
+                                })
+                                    ->where(function ($query) use ($search) {
+                                        $query->where('name', 'like', "%{$search}%")
+                                            ->orWhere('serial_number', 'like', "%{$search}%");
+                                    })
+                                    ->limit(50)
+                                    ->get()
+                                    ->mapWithKeys(fn($material) => [$material->id => "{$material->type->name} - {$material->serial_number}"])
+                                    ->toArray()
+                            )
+                            ->getOptionLabelsUsing(
+                                fn(array $values): array =>
+                                Material::whereIn('id', $values)
+                                    ->get()
+                                    ->mapWithKeys(fn($material) => [$material->id => "{$material->type->name} Número de série - {$material->serial_number}"])
+                                    ->toArray()
+                            ),
 
                         MarkdownEditor::make('description')
                             ->required()
@@ -88,7 +105,7 @@ class MaintenanceResource extends Resource
 
                 Section::make('Guia de Remessa')
                     ->description('Faça upload da Guia de Remessa gerada pelo S4 e outros arquivos caso necessário')
-                    ->schema([                
+                    ->schema([
                         FileUpload::make('file')
                             ->label('Arquivo')
                             ->directory('maintenance_files')
@@ -114,7 +131,7 @@ class MaintenanceResource extends Resource
 
                 TextColumn::make('download')
                     ->label('Arquivo')
-                    ->url(fn (Maintenance $record): string => url('storage/'.$record->file))
+                    ->url(fn(Maintenance $record): string => url('storage/' . $record->file))
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->limit(50)
@@ -143,9 +160,9 @@ class MaintenanceResource extends Resource
                         return $query
                             ->when(
                                 $data['Data'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
                             );
-                }),
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -161,19 +178,19 @@ class MaintenanceResource extends Resource
                     if (is_array($record['materials'])) {
                         // Atualizar o status de cada material para 'Cautelado'
                         foreach ($record['materials'] as $key => $id) {
-                            Material::where('id', $id)->update(['status' => $oldInfo[$key]['old_status']]); 
+                            Material::where('id', $id)->update(['status' => $oldInfo[$key]['old_status']]);
                         }
                     }
 
-                    if (Storage::exists('public/'.$record->file)) {
-                        Storage::delete('public/'.$record->file);
-                    } 
+                    if (Storage::exists('public/' . $record->file)) {
+                        Storage::delete('public/' . $record->file);
+                    }
 
                     Notification::make()
                         ->title('Manutenção deletada')
-                        ->icon('heroicon-o-wrench-screwdriver') 
+                        ->icon('heroicon-o-wrench-screwdriver')
                         ->body($authUser->name . ' deletou a manutenção ' . $record->name . '.')
-                    ->sendToDatabase($recipients);
+                        ->sendToDatabase($recipients);
                 }),
             ])
             ->bulkActions([
@@ -196,14 +213,14 @@ class MaintenanceResource extends Resource
                             ->label('Data de Criação')
                             ->formatStateUsing(function ($state) {
                                 return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
-                            }),   
+                            }),
                         TextEntry::make('updated_at')
                             ->label('Última atualização')
                             ->formatStateUsing(function ($state) {
                                 return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
-                            }),   
+                            }),
                         TextEntry::make('status')
-                            ->label('Situação'),   
+                            ->label('Situação'),
                     ])->columns(4),
                 \Filament\Infolists\Components\Section::make('Guia de Remessa')
                     ->description('Documento gerado pelo S4')
@@ -212,7 +229,7 @@ class MaintenanceResource extends Resource
                         PdfViewerEntry::make('file')
                             ->label('')
                             ->minHeight('80svh'),
-                    ]),  
+                    ]),
             ]);
     }
 

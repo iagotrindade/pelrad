@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('from');
             $table->string('to');
-            $table->string('graduation');
-            $table->string('name');
-            $table->string('idt');
-            $table->string('contact');
+            $table->string('graduation')->nullable();
+            $table->string('name')->nullable();
+            $table->string('idt')->nullable();
+            $table->string('contact')->nullable();
             $table->longText('materials_info');
+            $table->mediumText('loan_material_base_data');
             $table->timestamp('return_date');
             $table->string('status');
             $table->string('file');

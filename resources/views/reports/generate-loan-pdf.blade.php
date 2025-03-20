@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt_BR">
+<html lang="pt-br">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <title>Cautela de Material {{$data['to']}}</title>
+        <link rel="icon" type="image/x-icon" href="{{ public_path('storage/panel_assets/eb-logo.png') }}">
+        <title>Cautela de Material {{ $data['to'] ?? ''}}</title>
     </head>
 
     <body>
@@ -128,7 +129,7 @@
 
             <div class="header-personal-data">
                 <h1>Cautela de Material da {{$config->company}}</h1>
-                <p>1 .Declaro para os fins legais que eu, {{$data['name']}}, do {{$data['to']}}, recebi do Aux do {{$config->squad}} da {{$config->company}}, do {{$config->organization_slug}} o material abaixo relacionado:</p>
+                <p>1 .Declaro para os fins legais que eu, {{ $data['name'] ?? '' }}, do {{ $data['to'] ?? '' }}, recebi do Aux do {{$config->squad}} da {{$config->company}}, do {{$config->organization_slug}} o material abaixo relacionado:</p>
             </div>
 
             <div class="pdf-table">
@@ -145,14 +146,16 @@
                     <tbody>
                         @foreach ($data['material_group'] as $key => $group)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-
+                                <td>
+                                    {{ $loop->iteration }}</td>
                                 <td>
                                     {{ $group['groupName'] }} 
-                                    @if ($group['groupComponents']->isNotEmpty())
+                                    @if (!empty($group['groupComponents']))
                                         (
                                             @foreach ($group['groupComponents'] as $component)
-                                                {{ $component->name }}
+                                                @if ($component->show_on_loan)
+                                                    {{$component->loan_name }}{{ $loop->last ? '' : ', '}}
+                                                @endif
                                             @endforeach
                                         )
                                     @endif
@@ -166,7 +169,7 @@
                                     @endforeach
                                 </td>
 
-                                <td>{{ $group['obs'] }}</td>
+                                <td>{{ $group['obs'] ?? '' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -187,9 +190,9 @@
             <div class="pdf-subscriptions">
                 <div class="supported-subscription">
                     <p>______________________________________________</p>
-                    <p>{{$data['name']}} – {{$data['graduation']}}</p>
-                    <p>Identidade: {{$data['idt']}}</p>
-                    <p>Telefone: {{$data['contact']}}</p>
+                    <p>{{ $data['name'] ?? '' }} – {{ $data['graduation'] ?? '' }}</p>
+                    <p>Identidade: {{ $data['idt'] ?? '' }}</p>
+                    <p>Telefone: {{ $data['contact'] ?? '' }}</p>
                 </div>
 
                 <div class="squad-leader-subscription">

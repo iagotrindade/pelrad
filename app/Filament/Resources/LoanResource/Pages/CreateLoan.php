@@ -38,6 +38,7 @@ class CreateLoan extends CreateRecord
         $authUser = auth()->user();
         $recipients = User::all();
 
+        $data['loan_material_base_data'] = json_encode($data['material_group']);
         $record = static::getModel()::create($data);
 
         // Atualizar o status de cada material para 'Cautelado'
@@ -56,8 +57,8 @@ class CreateLoan extends CreateRecord
 
         Notification::make()
             ->title('Nova cautela gerada')
-            ->icon('heroicon-o-rectangle-stack') 
-            ->body(''.$authUser->name.' gerou uma nova cautela para '.$data['to'].'.')
+            ->icon('heroicon-o-rectangle-stack')
+            ->body('' . $authUser->name . ' gerou uma nova cautela para ' . $data['to'] . '.')
             ->actions([
                 Action::make('Visualizar')
                     ->link()
@@ -84,11 +85,11 @@ class CreateLoan extends CreateRecord
 
         foreach ($data['material_group'] as $key => $value) {
             if ($value['qtd'] == null) {
-                $value['qtd'] = count($value['materials']);     
+                $value['qtd'] = count($value['materials']);
             }
             foreach ($value['materials'] as $itemKey => $item) {
                 $value['materials'][$itemKey] = $materials[$item] ?? null;
-                
+
                 // Adicionar informações do material ao array
                 if (isset($materials[$item])) {
                     $materialInfoArray[] = $materials[$item];
@@ -96,7 +97,7 @@ class CreateLoan extends CreateRecord
             }
             $data['material_group'][$key] = $value;
 
-            $data['material_group'][$key]['groupName'] = $data['material_group'][$key]['materials'][0]->type->name; 
+            $data['material_group'][$key]['groupName'] = $data['material_group'][$key]['materials'][0]->type->name;
             $data['material_group'][$key]['groupComponents'] = $data['material_group'][$key]['materials'][0]->type->components;
         }
 
@@ -105,11 +106,11 @@ class CreateLoan extends CreateRecord
 
         $data['from'] = $configuration->organization;
         $data['status'] = 'Aberta';
-        $data['file'] = '/storage/loans/Cautela '.$data['graduation'].' - '.$data['name'].' '.$data['to'].' '.Carbon::now()->format('d.m.Y H\hi').'.pdf';
+        $data['file'] = '/storage/loans/Cautela ' . $data['graduation'] . ' - ' . $data['name'] . ' ' . $data['to'] . ' ' . Carbon::now()->format('d.m.Y H\hi') . '.pdf';
 
-        Pdf::loadView('reports.generate-loan-pdf', ['data' => $data, 'config' => Configuration::find(1)])->save(public_path().''.$data['file'].'')->stream('download.pdf');
+        Pdf::loadView('reports.generate-loan-pdf', ['data' => $data, 'config' => Configuration::find(1)])->save(public_path() . '' . $data['file'] . '')->stream('download.pdf');
 
-        $data['file'] = 'loans/Cautela '.$data['graduation'].' - '.$data['name'].' '.$data['to'].' '.Carbon::now()->format('d.m.Y H\hi').'.pdf';
+        $data['file'] = 'loans/Cautela ' . $data['graduation'] . ' - ' . $data['name'] . ' ' . $data['to'] . ' ' . Carbon::now()->format('d.m.Y H\hi') . '.pdf';
 
         return $data;
     }
@@ -119,49 +120,45 @@ class CreateLoan extends CreateRecord
     {
         return [
             Step::make('Dados do Militar')
-            ->description('Digite os dados de quem irá cautelar o material')
-            ->schema([
-                TextInput::make('to')
-                    ->required()
-                    ->label('Organização Militar')
-                    ->live(),
+                ->description('Digite os dados de quem irá cautelar o material')
+                ->schema([
+                    TextInput::make('to')
+                        ->required()
+                        ->label('Organização Militar')
+                        ->live(),
 
-                Select::make('graduation')
-                    ->required()
-                    ->label('Graduação')
-                    ->live()
-                    ->options([
-                        'Sd' => 'Soldado',
-                        'Cb' => 'Cabo',
-                        '3º Sgt' => '3º SGT',
-                        '2º Sgt' => '2º SGT',
-                        '1º Sgt' => '1º SGT',
-                        'Sub' => 'Subtenente',
-                        '2º Ten' => '2º Tenente',
-                        '1º Ten' => '1º Tenente',
-                        'Cap' => 'Capitão',
-                        'Major' => 'Major',
-                        'Ten Cel' => 'Tenente Coronel',
-                        'Cel' => 'Coronel',
-                    ]),
+                    Select::make('graduation')
+                        ->label('Graduação')
+                        ->live()
+                        ->options([
+                            'Sd' => 'Soldado',
+                            'Cb' => 'Cabo',
+                            '3º Sgt' => '3º SGT',
+                            '2º Sgt' => '2º SGT',
+                            '1º Sgt' => '1º SGT',
+                            'Sub' => 'Subtenente',
+                            '2º Ten' => '2º Tenente',
+                            '1º Ten' => '1º Tenente',
+                            'Cap' => 'Capitão',
+                            'Major' => 'Major',
+                            'Ten Cel' => 'Tenente Coronel',
+                            'Cel' => 'Coronel',
+                        ]),
 
                     TextInput::make('name')
-                        ->required()
                         ->label('Nome')
                         ->live(),
 
                     TextInput::make('idt')
-                        ->required()
                         ->label('Identidade')
                         ->live(),
 
                     TextInput::make('contact')
                         ->mask('(99) 9-9999-9999')
-                        ->required()
                         ->label('Contato')
                         ->length(16)
                         ->live()
-            ])->columns(3),
+                ])->columns(3),
 
             Step::make('Materiais')
                 ->description('Selecione os Materiais Cautelados')
@@ -170,13 +167,31 @@ class CreateLoan extends CreateRecord
                         ->schema([
                             Select::make('materials')
                                 ->multiple()
+                                ->preload()
                                 ->label('Materiais')
-                                ->getSearchResultsUsing(fn (string $search): array => Material::where('name', 'like', "%{$search}%")->where('status','Disponível')->limit(50)->pluck('name', 'id')->toArray())
-                                ->getOptionLabelsUsing(fn (array $values): array => Material::whereIn('id', $values)->where('status', 'Disponível')->pluck('name', 'id')->toArray())
+                                ->getSearchResultsUsing(
+                                    fn(string $search): array =>
+                                    Material::where('status', 'Disponível')
+                                        ->where(function ($query) use ($search) {
+                                            $query->where('name', 'like', "%{$search}%")
+                                                ->orWhere('serial_number', 'like', "%{$search}%");
+                                        })
+                                        ->limit(50)
+                                        ->get()
+                                        ->mapWithKeys(fn($material) => [$material->id => "{$material->type->name} - {$material->serial_number}"])
+                                        ->toArray()
+                                )
+                                ->getOptionLabelsUsing(
+                                    fn(array $values): array =>
+                                    Material::whereIn('id', $values)
+                                        ->where('status', 'Disponível')
+                                        ->get()
+                                        ->mapWithKeys(fn($material) => [$material->id => "{$material->type->name} - {$material->serial_number}"])
+                                        ->toArray()
+                                )
                                 ->afterStateUpdated(function (?array $state, ?array $old) {
                                     $this->selectedMaterial = $state;
                                 }),
-
                             TextInput::make('qtd')
                                 ->label('Quantidade')
                                 ->type('number')
@@ -187,26 +202,24 @@ class CreateLoan extends CreateRecord
                                 ->label('Observações')
                                 ->placeholder('S/A')
                                 ->default('S/A'),
-                            ])
-                            ->label('Materiais')
-                            ->columns(3)
-                            ->collapsible()
-                            ->collapsible(),
-        
+                        ])
+                        ->label('Materiais')
+                        ->columns(3)
+                        ->collapsible()
+                        ->collapsible(),
+
                     DatePicker::make('return_date')
-                    ->required()
-                    ->label('Data de retorno')
-                    ->live(),
+                        ->required()
+                        ->label('Data de retorno')
+                        ->live(),
                 ]),
 
-            
-            ];
+
+        ];
     }
 
     protected function getHeaderActions(): array
     {
-        return [
-
-        ];
+        return [];
     }
 }

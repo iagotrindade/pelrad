@@ -56,35 +56,41 @@ class CategoryResource extends Resource
                     ])
                     ->columns(1),
 
-                    Section::make()
-                        ->schema([
-                            Repeater::make('components')
-                                ->relationship('components') // Define o relacionamento
-                                ->schema([
-                                    Hidden::make('id'), // Campo oculto para o ID do componente
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->label('Nome'),
+                Section::make()
+                    ->schema([
+                        Repeater::make('components')
+                            ->relationship('components') // Define o relacionamento
+                            ->schema([
+                                Hidden::make('id'), // Campo oculto para o ID do componente
+                                TextInput::make('name')
+                                    ->required()
+                                    ->label('Nome'),
+                                TextInput::make('loan_name')
+                                    ->required()
+                                    ->label('Nome na Cautela'),
+                                TextInput::make('serial_number')
+                                    ->label('Nr de Serie')
+                                    ->required(),
 
-                                    TextInput::make('serial_number')
-                                        ->label('Nr de Serie')
-                                        ->required(),
+                                TextInput::make('code_number')
+                                    ->required()
+                                    ->label('Código do Componente'),
 
-                                    TextInput::make('code_number')
-                                        ->required()
-                                        ->label('Código do Componente'),
-
-                                    TextInput::make('quantity')
-                                        ->required()
-                                        ->numeric()
-                                        ->label('Quantidade')
-                                        ->default(1),
-                                ])
-                                ->columns(4)
-                                ->label('Componentes')
-                                ->collapsible()
-                                ->defaultItems(0)
-                        ])
+                                TextInput::make('quantity')
+                                    ->required()
+                                    ->numeric()
+                                    ->label('Quantidade')
+                                    ->default(1),
+                                Toggle::make('show_on_loan')
+                                    ->label('Mostrar nas Cautelas')
+                                    ->default(true)
+                                    ->inline(false)
+                            ])
+                            ->columns(2)
+                            ->label('Componentes')
+                            ->collapsible()
+                            ->defaultItems(0)
+                    ])
             ]);
     }
 
@@ -108,9 +114,7 @@ class CategoryResource extends Resource
                     ->searchable()
                     ->sortable()
             ])
-            ->filters([
-                
-            ])
+            ->filters([])
             ->actions([
                 ActivityLogTimelineTableAction::make('Logs'),
                 Tables\Actions\EditAction::make(),
@@ -124,7 +128,7 @@ class CategoryResource extends Resource
                         ->title('Categoria deletada')
                         ->icon('heroicon-o-tag')
                         ->body($authUser->name . ' deletou a categoria ' . $record->name . '.')
-                    ->sendToDatabase($recipients);
+                        ->sendToDatabase($recipients);
                 }),
             ])
             ->bulkActions([

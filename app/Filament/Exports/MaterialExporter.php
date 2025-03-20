@@ -41,7 +41,7 @@ class MaterialExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Sua exportação dos materiais está completa e ' . number_format($export->successful_rows) . ' ' . str('linha')->plural($export->successful_rows) . ' foi exportada.';
+        $body = 'Sua exportação dos materiais está completa e ' . number_format($export->successful_rows) . ' ' . str('linha')->plural($export->successful_rows) . ' foram exportadas.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
             $body .= ' ' . number_format($failedRowsCount) . ' ' . str('linha')->plural($failedRowsCount) . ' falhou ao ser importada.';

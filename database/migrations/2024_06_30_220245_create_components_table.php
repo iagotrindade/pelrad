@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('components', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('loan_name');
             $table->string('code_number');
             $table->string('quantity');
             $table->string('serial_number');
+            $table->boolean('show_on_loan');
             $table->timestamps();
         });
     }

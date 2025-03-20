@@ -20,6 +20,7 @@ class Loan extends Model
         'idt',
         'contact',
         'materials_info',
+        'loan_material_base_data',
         'return_date',
         'file',
         'signed_file',

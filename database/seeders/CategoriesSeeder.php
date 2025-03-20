@@ -14,14 +14,9 @@ class CategoriesSeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'CONJUNTO RÁDIO PRO 5150',
-            'RÁDIO SET/DE 42 A 50 MHZ PRO 5100',
-            'ESTAÇÃO REPETIDORA PRO/5100',
-            'CONJUNTO RÁDIO PRO 5100',
-            'NOTEBOOK INTEL MODELO PENTIUN',
-            'UNIDADE INTERFACE DE COMUNICAÇÃO',
+            // MOTOROLA
+            'ANTENA SINCLAIR',
             'ESTAÇÃO REPETIDORA GTR 8000',
-            'CONVERSOR DE CORRENTE CONTÍNUA',
             'RÁDIO XTL 1500',
             'RÁDIO XTL 2200',
             'RÁDIO XTS 1500',
@@ -33,6 +28,7 @@ class CategoriesSeeder extends Seeder
             'CONSOLE DE DESPACHO MCC 7500',
             'RASTREADOR SATELITAL GPS',
             'MOTOBRIDGE 8 PORTAS',
+            'MOTOBRIDGE 4 PORTAS',
             'CARREGADOR MÚLTIPLO DE BATERIA',
             'NOTEBOOK ACER',
             'NOTEBOOK SAMSUNG',
@@ -50,25 +46,21 @@ class CategoriesSeeder extends Seeder
             'ANTENA TÁTICA DVR',
             'ANTENA MÓVEL DVR',
             'CASE TIPO BAÚ / 80X50X50 CMZ',
-            'FALCON III',
+            'NOTEBOOK ROBUSTECIDO',
+            
+            // HARIS
+            'RF 7800V HH 001 (FALCON III)',
             'BATERIA FALCON III',
             'CARREGADOR FALCON III',
             'CABO DE DADOS FALCON III',
             'ADAPTADOR USB FALCON III',
-            'FALCON II',
+            'ADAPTADOR VISOR FALCON III',
+            'RF 7850M HH 001 MB (FALCON III MULTI-BANDA)',
+            'MPR 9600 MP (FALCON II)',
             'CARREGADOR FALCON II',
             'PTT FALCON',
-            'ANTENA DIPOLO',
-            'RADIO YAESU SISTEM 600',
             'FONTE DE ALIMENTAÇÃO YAESU',
-            'RÁDIO IC-A23',
-            'VERTEX 1700',
-            'RÁDIO TADIRAN',
-            'BATTERY STORAGE TADIRAN',
             'FONTE DE ALIMENTAÇÃO',
-            'WALTIMETRO',
-            'AMPLIFICADOR DE POTÊNCIA',
-            'ESTANTE DE AÇO',
             'BASE VEICULAR FALCON III',
         ];
 
@@ -76,6 +68,8 @@ class CategoriesSeeder extends Seeder
             DB::table('categories')->insert([
                 'name' => $category,
                 'show_compliance' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }

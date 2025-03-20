@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <link rel="icon" type="image/x-icon" href="{{ public_path('storage/panel_assets/eb-logo.png') }}">
         <title>Relatório de usuários {{$config->squad . ' ' . $config->company}}</title>
     </head>
     <body>
@@ -143,9 +144,9 @@
 
                                 <td>
                                     @if ($user->avatar == null)
-                                        <img class="user-image" src="{{ public_path('storage/panel_assets/default_user.png') }}" alt="Imagem do Usuário"> 
+                                        <img class="user-image" src="{{ url('storage/panel_assets/default_user.png') }}" alt="Imagem do Usuário"> 
                                     @else
-                                        <img class="user-image" src="{{ public_path('storage/'.$user->avatar.'') }}" alt="Imagem do Usuário"> 
+                                        <img class="user-image" src="{{ url('storage/'.$user->avatar) }}" alt="Imagem do Usuário"> 
                                     @endif
                                     
                                 </td>

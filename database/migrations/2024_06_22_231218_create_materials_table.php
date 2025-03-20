@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('patrimony_value')->nullable();
             $table->string('inclusion_document')->nullable();
             $table->timestamp('inclusion_date')->nullable();
-            $table->string('name');
+            $table->longText('name');
             $table->string('serial_number');
             $table->text('description')->nullable();
             $table->string('status');

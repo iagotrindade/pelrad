@@ -81,9 +81,9 @@ class ConsultOracle extends Component
 
     public function onlineConsult() {
         $this->iaData = [
-            'urlDaAplicação' => 'https://pelrad.app/',
+            'urlDaAplicação' => url(),
             'atividades' => Activity::select('description', 'event', 'created_at')->get(),
-            'materiais' => Material::select('name', 'description', 'status', 'categories_id')->with(['type:id,name'])->get(),
+            'materiais' => Material::select('name', 'status', 'categories_id')->with(['type:id,name'])->get(),
             'usuarios' => User::select('graduation', 'name', 'email')->get(),
             'cautelas' => Loan::select('to', 'graduation', 'name', 'contact', 'status', 'materials_info', 'return_date')->get(),
             'manutencoes' => Maintenance::select('status', 'destiny', 'created_at', 'file')->get(),
@@ -104,7 +104,9 @@ class ConsultOracle extends Component
             ];
         }
 
-        $context = "Histórico de Conversa:\n" . $history . " Dados do sistema: " . json_encode($this->iaData);
+        $this->iaData = json_encode($this->iaData);
+
+        $context = "Histórico de Conversa:\n" . $history . " Dados do sistema: " . $this->iaData;
 
         // Tratamento de exceções usando try-catch
     try {
@@ -117,7 +119,7 @@ class ConsultOracle extends Component
             'json' => [
                 'message' => $context . "\nPergunta: " . $this->prompt . "\nResposta:",
                 'model' => 'command-r-08-2024',
-                'preamble' => 'Seu nome é "Antigão" e foi desenvolvido pelo 3º Sgt Iago Silva. Você possuí conhecimento sobre todas informações do sistema. Sempre que não souber a respsota deve pesquisar o que não encontrar na internet. Você é treinado para ajudar os usuários, fornecendo respostas completas e úteis às suas dúvidas. Lembre-se que suas respostas devem ser sempre completas e o mais detalhadas possíveis'
+                'preamble' => 'Seu nome é "Antigão" e foi desenvolvido pelo 3º Sgt Iago Silva. Você possuí conhecimento sobre todas informações do sistema. Sempre que não souber a resposta deve pesquisar o que não encontrar na internet. Você é treinado para ajudar os usuários, fornecendo respostas completas e úteis às suas dúvidas. Lembre-se que suas respostas devem ser sempre completas e o mais detalhadas possíveis'
             ]
         ]);
 

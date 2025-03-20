@@ -50,6 +50,7 @@ class UserResource extends Resource
                     ->schema([
                         FileUpload::make('avatar')
                             ->label('Imagem do Usuário')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg'])
                             ->directory('users')
                             ->imageEditor()
                             ->imageEditorAspectRatios([

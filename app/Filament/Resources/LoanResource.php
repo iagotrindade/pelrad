@@ -65,20 +65,62 @@ class LoanResource extends Resource
     {
         return $form
             ->schema([
+                Section::make('Dados do Militar')
+                    ->description('Digite os dados de quem irá cautelar o material')
+                    ->schema([
+                        TextInput::make('to')
+                            ->required()
+                            ->label('Organização Militar')
+                            ->live(),
+                        Select::make('graduation')
+                            ->label('Graduação')
+                            ->live()
+                            ->options([
+                                'Sd' => 'Soldado',
+                                'Cb' => 'Cabo',
+                                '3º Sgt' => '3º SGT',
+                                '2º Sgt' => '2º SGT',
+                                '1º Sgt' => '1º SGT',
+                                'Sub' => 'Subtenente',
+                                '2º Ten' => '2º Tenente',
+                                '1º Ten' => '1º Tenente',
+                                'Cap' => 'Capitão',
+                                'Major' => 'Major',
+                                'Ten Cel' => 'Tenente Coronel',
+                                'Cel' => 'Coronel',
+                            ]),
+
+                        TextInput::make('name')
+                            ->label('Nome')
+                            ->live(),
+
+                        TextInput::make('idt')
+                            ->label('Identidade')
+                            ->live(),
+
+                        TextInput::make('contact')
+                            ->mask('(99) 9-9999-9999')
+                            ->label('Contato')
+                            ->length(16)
+                            ->live(),
+                    ])->columns(2),
                 Section::make('Situação')
                     ->description('Altere a situação e anexe a cautela assinada')
                     ->schema([
                         Select::make('status')
-                        ->label('Status')
-                        ->options([
-                            'Aberta' => 'Aberta',
-                            'Fechada' => 'Fechada'
-                        ]),
+                            ->label('Status')
+                            ->options([
+                                'Aberta' => 'Aberta',
+                                'Fechada' => 'Fechada'
+                            ]),
+                        DatePicker::make('return_date')
+                            ->required()
+                            ->label('Data de retorno')
+                            ->live(),
                         FileUpload::make('signed_file')
                             ->label('Cautela Assinada')
                             ->directory('loans')
                             ->acceptedFileTypes(['application/pdf']),
-                        
                     ]),
             ]);
     }
@@ -118,7 +160,7 @@ class LoanResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('download')
                     ->label('PDF')
-                    ->url(fn (Loan $record): string => url('storage/'.$record->file))
+                    ->url(fn(Loan $record): string => url('storage/' . $record->file))
                     ->default('Download')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->openUrlInNewTab()
@@ -133,16 +175,16 @@ class LoanResource extends Resource
                         return $query
                             ->when(
                                 $data['Data'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
                             );
-                }),
+                    }),
 
                 TrashedFilter::make()
             ])
 
             ->actions([
-                ActivityLogTimelineTableAction::make('Logs'),
                 ViewAction::make(),
+                ActivityLogTimelineTableAction::make('Logs'),
                 EditAction::make(),
                 DeleteAction::make()->before(function ($record) {
                     $authUser = auth()->user();
@@ -166,16 +208,16 @@ class LoanResource extends Resource
 
                     if (Storage::exists($relativePath)) {
                         Storage::delete($relativePath);
-                    } 
+                    }
 
                     Notification::make()
                         ->title('Cautela deletada')
-                        ->icon('heroicon-o-rectangle-stack') 
+                        ->icon('heroicon-o-rectangle-stack')
                         ->body($authUser->name . ' deletou a cautela ' . $record->name . '.')
-                    ->sendToDatabase($recipients);
+                        ->sendToDatabase($recipients);
                 }),
 
-                
+
                 RestoreAction::make(),
             ])
             ->bulkActions([
@@ -202,20 +244,20 @@ class LoanResource extends Resource
                         TextEntry::make('idt')
                             ->label('Identindade'),
                         TextEntry::make('contact')
-                            ->url(fn (Loan $record): string => 'https://wa.me/55'.str_replace(['(', ')', '-', ' '], '', $record->contact).'', shouldOpenInNewTab: true)
+                            ->url(fn(Loan $record): string => 'https://wa.me/55' . str_replace(['(', ')', '-', ' '], '', $record->contact) . '', shouldOpenInNewTab: true)
                             ->label('Contato'),
                         TextEntry::make('created_at')
                             ->label('Data da cautela')
                             ->formatStateUsing(function ($state) {
                                 return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
-                            }), 
+                            }),
                         TextEntry::make('return_date')
                             ->label('Previsão de retorno')
                             ->formatStateUsing(function ($state) {
                                 return \Carbon\Carbon::parse($state)->translatedFormat('d M Y');
-                            }),    
+                            }),
                         TextEntry::make('status')
-                            ->label('Situação'),   
+                            ->label('Situação'),
                     ])->columns(4),
                 \Filament\Infolists\Components\Section::make('Cautela não Assinada')
                     ->description('PDF gerado na criação cautela')
@@ -233,7 +275,7 @@ class LoanResource extends Resource
                             ->label('')
                             ->minHeight('80svh')
                     ]),
-                
+
             ]);
     }
 

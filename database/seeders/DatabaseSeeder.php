@@ -11,6 +11,7 @@ use App\Models\Component;
 use App\Models\Compliance;
 use App\Models\Configuration;
 use Illuminate\Database\Seeder;
+use Database\Seeders\HarisSeeder;
 use Illuminate\Support\Facades\Hash;
 use Database\Factories\MaterialFactory;
 
@@ -34,6 +35,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CategoriesSeeder::class,
+            HarisSeeder::class,
+            MotorolaSeeder::class,
+            ComponentsSeeder::class,
         ]);
 
         Configuration::factory()->create([

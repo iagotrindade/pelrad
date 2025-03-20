@@ -20,9 +20,11 @@ use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Actions\ImportAction;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\MaterialExporter;
 use App\Filament\Imports\MaterialImporter;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use App\Filament\Resources\MaterialResource\Pages;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 
@@ -48,8 +50,8 @@ class MaterialResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\FileUpload::make('images')
-                            ->image()
                             ->label('Imagens')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg'])
                             ->multiple()
                             ->reorderable()
                             ->maxFiles(5)
@@ -80,7 +82,7 @@ class MaterialResource extends Resource
 
                         TextInput::make('patrimony_number')
                             ->label('Nr de Patrimônio'),
-      
+
                         TextInput::make('patrimony_value')
                             ->mask(RawJs::make('$money($input)'))
                             ->label('Valor de Patrimônio')
@@ -116,7 +118,10 @@ class MaterialResource extends Resource
                 ImportAction::make()
                     ->importer(MaterialImporter::class),
                 ExportAction::make()
-                    ->exporter(MaterialExporter::class),
+                    ->exporter(MaterialExporter::class)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                    ]),
             ])
             ->columns([
                 Tables\Columns\ImageColumn::make('images')
@@ -126,24 +131,31 @@ class MaterialResource extends Resource
                 Tables\Columns\TextColumn::make('serial_number')
                     ->searchable()
                     ->label('Nr de Serie'),
-
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('patrimony_number') // Aqui referenciamos a relação
                     ->searchable()
-                    ->label('Nome')
-                    ->limit(30),
+                    ->label('Nr de Patrimônio'),
+                Tables\Columns\TextColumn::make('type.name') // Aqui referenciamos a relação
+                    ->searchable()
+                    ->label('Nome'),
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'Disponível' => 'success',
                         'Indisponível' => 'danger',
                         'Cautelado' => 'warning',
                         'Manutenção' => 'warning',
                         'Descarregado' => 'danger',
-                })
+                    })
             ])
 
             ->filters([
+                SelectFilter::make('Material')
+                    ->relationship('type', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
+
                 Filter::make('data')
                     ->form([
                         DatePicker::make('Última atualização'),
@@ -152,9 +164,9 @@ class MaterialResource extends Resource
                         return $query
                             ->when(
                                 $data['Última atualização'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
                             );
-                }),
+                    }),
 
                 Filter::make('inclusion')
                     ->form([
@@ -164,10 +176,10 @@ class MaterialResource extends Resource
                         return $query
                             ->when(
                                 $data['Inclusão em carga'],
-                                fn (Builder $query, $date): Builder => $query->where('inclusion_date', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->where('inclusion_date', '>=', $date),
                             );
-                }),
-                
+                    }),
+
                 Tables\Filters\TrashedFilter::make()
             ])
 
@@ -179,15 +191,15 @@ class MaterialResource extends Resource
                     $authUser = Auth::user();
                     $recipients = User::all();
 
-                    if($record->components && $record->components->isNotEmpty()) {
+                    if ($record->components && $record->components->isNotEmpty()) {
                         return;
                     }
 
                     Notification::make()
                         ->title('Material deletado')
-                        ->icon('heroicon-o-cube') 
+                        ->icon('heroicon-o-cube')
                         ->body($authUser->name . ' deletou o material ' . $record->name . '.')
-                    ->sendToDatabase($recipients);
+                        ->sendToDatabase($recipients);
                 }),
 
                 Tables\Actions\RestoreAction::make()->before(function ($record) {
@@ -196,9 +208,9 @@ class MaterialResource extends Resource
 
                     Notification::make()
                         ->title('Material restaurado')
-                        ->icon('heroicon-o-cube') 
+                        ->icon('heroicon-o-cube')
                         ->body($authUser->name . ' restaurou o material ' . $record->name . '.')
-                    ->sendToDatabase($recipients);
+                        ->sendToDatabase($recipients);
                 }),
             ])
             ->bulkActions([
