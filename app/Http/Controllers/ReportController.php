@@ -24,7 +24,7 @@ class ReportController extends Controller
     public function generateComplianceReport() {
         $compliances = Compliance::all();
         $openLoans = Loan::where('status', 'Aberta')->get();
-        $maintenanceMaterials = Maintenance::where('status', 'Em andamento')->get();
+        $maintenances = Maintenance::where('status', 'Em andamento')->get();
 
         // Recupera todas as categorias com seus materiais
         $categories = Category::with('materials')->where('show_compliance', 1)->get();
@@ -58,15 +58,21 @@ class ReportController extends Controller
 
         // Manutenção 
         $maintenanceMaterialsWithDetails = [];
-
-        foreach ($maintenanceMaterials as $maintenance) {
-            foreach ($maintenance['materials'] as $materialId) {
+        
+        foreach ($maintenances as $maintenance) {
+            foreach ($maintenance->materials as $materialId) {
                 $material = Material::find($materialId);
 
-                $maintenanceMaterialsWithDetails[] = [
-                    'maintenance' => $maintenance,
-                    'material' => $material->type,
-                ];
+                $category = $material->type;
+
+                if (!isset($maintenanceMaterialsWithDetails[$category->name])) {
+                    $maintenanceMaterialsWithDetails[$category->name] = [
+                        'count' => 0,
+                        'maintenance' => $maintenance,
+                        'material' => $material->type,
+                    ];
+                }
+                $maintenanceMaterialsWithDetails[$category->name]['count']++;
             }
         }
 

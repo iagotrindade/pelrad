@@ -90,13 +90,16 @@ class ConfigurationResource extends Resource
                     ->label('Pelotão'),
 
                 TextColumn::make('squad_leader')
-                    ->label('Comandante de Pelotão'),
+                    ->label('Comandante de Pelotão')
+                    ->limit(20),
 
                 TextColumn::make('company_leader')
-                    ->label('Comandante de Companhia'),
+                    ->label('Comandante de Companhia')
+                    ->limit(20),
 
                 TextColumn::make('organization_s4')
-                    ->label('Chefe do S4'),
+                    ->label('Chefe do S4')
+                    ->limit(20),
             ])
             ->filters([
                 //

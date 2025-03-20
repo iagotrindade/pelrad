@@ -188,14 +188,14 @@
                                             {{ Str::upper($maintenance['material']->name) }}
                                         </td>
                                         
-                                        @if ($index == 0)
+                                        @if ( $loop->first )
                                             <td rowspan="{{ count($maintenanceMaterials) }}">
                                                 MANUTENÇÃO
                                             </td>
                                         @endif
 
                                         <td>
-                                            1
+                                            {{ Str::upper($maintenanceMaterials[$index]['count'])}}
                                         </td>
 
                                         <td>

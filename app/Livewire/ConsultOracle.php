@@ -83,7 +83,7 @@ class ConsultOracle extends Component
         $this->iaData = [
             'urlDaAplicação' => url(),
             'atividades' => Activity::select('description', 'event', 'created_at')->get(),
-            'materiais' => Material::select('name', 'status', 'categories_id')->with(['type:id,name'])->get(),
+            //'materiais' => Material::select('name', 'status', 'categories_id')->with(['type:id,name'])->get(),
             'usuarios' => User::select('graduation', 'name', 'email')->get(),
             'cautelas' => Loan::select('to', 'graduation', 'name', 'contact', 'status', 'materials_info', 'return_date')->get(),
             'manutencoes' => Maintenance::select('status', 'destiny', 'created_at', 'file')->get(),
