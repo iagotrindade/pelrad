@@ -223,6 +223,7 @@ class MaintenanceResource extends Resource
                             ->label('Situação'),
                         TextEntry::make('materials')
                             ->label('Materiais')
+                            ->columnSpan(4)
                             ->formatStateUsing(function ($state) {
                                 // Converte a string separada por vírgulas em um array
                                 $ids = array_map('trim', explode(',', $state));
