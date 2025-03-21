@@ -15,6 +15,7 @@ class GeneralOverview extends BaseWidget
 {
     protected int | string | array $columnSpan = 'full';
     protected static ?string $pollingInterval = '10s';
+    protected static ?int $sort = 2;
 
     protected function getStats(): array
     {

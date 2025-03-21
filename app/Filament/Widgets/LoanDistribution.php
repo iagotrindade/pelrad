@@ -10,6 +10,7 @@ class LoanDistribution extends ChartWidget
 {
     protected static ?string $heading = 'Cautelas';
     protected static ?string $maxHeight = '400px';
+    protected static ?int $sort = 4;
 
     protected function getData(): array
     {

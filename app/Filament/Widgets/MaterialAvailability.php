@@ -10,6 +10,7 @@ class MaterialAvailability extends ChartWidget
 {
     protected static ?string $heading = 'Materiais';
     protected static ?string $maxHeight = '400px';
+    protected static ?int $sort = 5;
 
     protected static ?string $pollingInterval = '10s';
 
