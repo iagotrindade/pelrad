@@ -59,17 +59,5 @@ class MaterialOverviewChart extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
-    }
-
-    protected function getOptions(): array
-    {
-        return [
-            'indexAxis' => 'y', // Configura o gráfico para ser horizontal
-            'scales' => [
-                'x' => [
-                    'beginAtZero' => true, // Inicia o eixo X no zero
-                ],
-            ],
-        ];
-    }
+    }  
 }

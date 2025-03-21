@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('status');
             $table->string('file');
             $table->string('signed_file')->nullable();
+            $table->string('return_file')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

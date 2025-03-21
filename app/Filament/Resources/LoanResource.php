@@ -132,6 +132,12 @@ class LoanResource extends Resource
                 TextColumn::make('to')
                     ->searchable()
                     ->label('OM:'),
+                TextColumn::make('name')
+                    ->dateTime()
+                    ->label('Militar')
+                    ->formatStateUsing(fn(Loan $record): string => $record->graduation . ' ' . $record->name)
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('status')
                     ->searchable(),
                 TextColumn::make('return_date')
@@ -142,22 +148,6 @@ class LoanResource extends Resource
                     })
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->label('Criado em:')
-                    ->formatStateUsing(function ($state) {
-                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y \à\s H:i');
-                    })
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->label('Atualizado em:')
-                    ->formatStateUsing(function ($state) {
-                        return \Carbon\Carbon::parse($state)->translatedFormat('d M Y \à\s H:i');
-                    })
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('download')
                     ->label('PDF')
                     ->url(fn(Loan $record): string => url('storage/' . $record->file))
@@ -275,6 +265,15 @@ class LoanResource extends Resource
                             ->label('')
                             ->minHeight('80svh')
                     ]),
+                \Filament\Infolists\Components\Section::make('Descautela')
+                    ->description('Gerada após o fechamento da Cautela')
+                    ->collapsible()
+                    ->schema([
+                        PdfViewerEntry::make('return_file')
+                            ->label('')
+                            ->minHeight('80svh')
+                    ]),
+
 
             ]);
     }

@@ -68,6 +68,10 @@ class EditLoan extends EditRecord
             $data = $this->generatePDF($data, $record);
         }
 
+        if($data['status'] == 'Fechada') {
+
+        }
+
         // Atualizar o registro no banco
         $record->update($data);
 
@@ -99,7 +103,6 @@ class EditLoan extends EditRecord
         $groupComponents = new Collection($groupComponents);
         $data['material_group'][0]['groupComponents'] = $groupComponents;
 
-
         $groupMaterials = collect($data['material_group'][0]['materials'])->map(function ($materialData) {
             return (new Material())->forceFill($materialData)->setRawAttributes($materialData, true);
         });
@@ -109,6 +112,7 @@ class EditLoan extends EditRecord
         $configuration = Configuration::find(1);
         $data['from'] = $configuration->organization;
         $data['file'] = '/storage/loans/Cautela ' . $data['graduation'] . ' - ' . $data['name'] . ' ' . $data['to'] . ' ' . Carbon::now()->format('d.m.Y H\hi') . '.pdf';
+        $data['return_file'] = '/storage/loans/Descautela ' . $data['graduation'] . ' - ' . $data['name'] . ' ' . $data['to'] . ' ' . Carbon::now()->format('d.m.Y H\hi') . '.pdf';
 
         // Deletar o PDF antigo
         $relativePath = str_replace('storage/', '', $record->file);
@@ -119,11 +123,17 @@ class EditLoan extends EditRecord
 
         Pdf::loadView('reports.generate-loan-pdf', ['data' => $data, 'config' => $configuration])->save(public_path() . '' . $data['file'] . '')->stream('download.pdf');
 
+        $data['loan_type'] = 'descautela';
+        
+        Pdf::loadView('reports.generate-loan-pdf', ['data' => $data, 'config' => $configuration])->save(public_path() . '' . $data['return_file'] . '')->stream('descautela.pdf');
+
         $data['file'] = 'loans/Cautela ' . $data['graduation'] . ' - ' . $data['name'] . ' ' . $data['to'] . ' ' . Carbon::now()->format('d.m.Y H\hi') . '.pdf';
+        $data['return_file'] = 'loans/Descautela ' . $data['graduation'] . ' - ' . $data['name'] . ' ' . $data['to'] . ' ' . Carbon::now()->format('d.m.Y H\hi') . '.pdf';
 
         return $data;
     }
 
+    
     protected function getHeaderActions(): array
     {
         return [

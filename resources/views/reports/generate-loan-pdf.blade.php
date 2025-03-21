@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="icon" type="image/x-icon" href="{{ public_path('storage/panel_assets/eb-logo.png') }}">
-    <title>Cautela de Material {{ $data['to'] ?? '' }}</title>
+    <title>@if($data['loan_type'] && $data['loan_type'] == 'descautela')Descautela @endif de Material {{ $data['to'] ?? '' }}</title>
 </head>
 
 <body>
@@ -136,7 +136,7 @@
         </div>
 
         <div class="header-personal-data">
-            <h1>Cautela de Material da {{ $config->company }}</h1>
+            <h1>@if($data['loan_type'] && $data['loan_type'] == 'descautela')Descautela @endif de Material da {{ $config->company }}</h1>
             <p>1 .Declaro para os fins legais que eu, {{ $data['name'] ?? '' }}, do {{ $data['to'] ?? '' }}, recebi do
                 Aux do {{ $config->squad }} da {{ $config->company }}, do {{ $config->organization_slug }} o material
                 abaixo relacionado:</p>
@@ -186,14 +186,16 @@
             </table>
         </div>
 
-        <div class="pdf-devolution-info">
-            <br>
-            <p>2. Data prevista para devolução do material:
-                {{ Carbon\Carbon::createFromFormat('Y-m-d', $data['return_date'])->translatedFormat('d \d\e F \d\e Y') }}
-            </p>
-            <p>3. O material deverá ser entregue manutenido e em horário de expediente.</p>
-            <p>4. O material não deve ser recautelado para outras OM’s.</p>
-        </div>
+        @if($date['loan_type'] && $date['loan_type'] == 'descautela')
+            <div class="pdf-devolution-info">
+                <br>
+                <p>2. Data prevista para devolução do material:
+                    {{ Carbon\Carbon::createFromFormat('Y-m-d', $data['return_date'])->translatedFormat('d \d\e F \d\e Y') }}
+                </p>
+                <p>3. O material deverá ser entregue manutenido e em horário de expediente.</p>
+                <p>4. O material não deve ser recautelado para outras OM’s.</p>
+            </div>
+        @endif
 
         <div class="pdf-date-info">
             <p>Quartel em Porto Alegre – RS, {{ Carbon\Carbon::now()->translatedFormat('d \d\e F \d\e Y') }}</p>
@@ -220,26 +222,28 @@
             </tbody>
         </table>
 
-        <table>
-            <tbody>
-                <tr>
-                    <td style="padding: 24px 0px">
-                        <div class="company-leader-subscription">
-                            <p>______________________________________________</p>
-                            <p>{{ $config->company_leader }}</p>
-                            <p>Comandante de Companhia</p>
-                        </div>
-                    </td>
+        @if($data['loan_type'] && $data['loan_type'] == 'descautela')
+            <table>
+                <tbody>
+                    <tr>
+                        <td style="padding: 24px 0px">
+                            <div class="company-leader-subscription">
+                                <p>______________________________________________</p>
+                                <p>{{ $config->company_leader }}</p>
+                                <p>Comandante de Companhia</p>
+                            </div>
+                        </td>
 
-                    
-                    <td>
-                        <div class="om-s4-subscription">
-                            <p>______________________________________________</p>
-                            <p>{{ $config->organization_s4 }}</p>
-                            <p>Ch 4ª Seç {{ $config->organization_slug }}</p>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                        
+                        <td>
+                            <div class="om-s4-subscription">
+                                <p>______________________________________________</p>
+                                <p>{{ $config->organization_s4 }}</p>
+                                <p>Ch 4ª Seç {{ $config->organization_slug }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        @endif
                 
