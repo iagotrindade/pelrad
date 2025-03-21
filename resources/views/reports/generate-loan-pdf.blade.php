@@ -7,7 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="icon" type="image/x-icon" href="{{ public_path('storage/panel_assets/eb-logo.png') }}">
-    <title>@if($data['loan_type'] && $data['loan_type'] == 'descautela')Descautela @endif de Material {{ $data['to'] ?? '' }}</title>
+    <title>
+        @if (!empty($data['loan_type']) && $data['loan_type'] == 'descautela')
+            Descautela
+        @endif
+        de Material {{ $data['to'] ?? '' }}
+    </title>
 </head>
 
 <body>
@@ -136,8 +141,14 @@
         </div>
 
         <div class="header-personal-data">
-            <h1>@if($data['loan_type'] && $data['loan_type'] == 'descautela')Descautela @endif de Material da {{ $config->company }}</h1>
-            <p>1 .Declaro para os fins legais que eu, {{ $data['name'] ?? '' }}, do {{ $data['to'] ?? '' }}, recebi do
+            <h1>
+                @if (!empty($data['loan_type']) && $data['loan_type'] == 'descautela')
+                    Descautela
+                @endif de Material da {{ $config->company }}
+            </h1>
+            <p>1. Declaro para os fins legais que eu, {{ $data['name'] ?? '' }}, do {{ $data['to'] ?? '' }},
+                {{ !empty($data['loan_type']) && $data['loan_type'] == 'descautela' ? 'devolvi ao' : 'recebi do' }}
+
                 Aux do {{ $config->squad }} da {{ $config->company }}, do {{ $config->organization_slug }} o material
                 abaixo relacionado:</p>
         </div>
@@ -186,7 +197,7 @@
             </table>
         </div>
 
-        @if($date['loan_type'] && $date['loan_type'] == 'descautela')
+        @if (empty($data['loan_type']))
             <div class="pdf-devolution-info">
                 <br>
                 <p>2. Data prevista para devolução do material:
@@ -222,7 +233,7 @@
             </tbody>
         </table>
 
-        @if($data['loan_type'] && $data['loan_type'] == 'descautela')
+        @if (empty($data['loan_type']))
             <table>
                 <tbody>
                     <tr>
@@ -234,7 +245,7 @@
                             </div>
                         </td>
 
-                        
+
                         <td>
                             <div class="om-s4-subscription">
                                 <p>______________________________________________</p>
@@ -246,4 +257,3 @@
                 </tbody>
             </table>
         @endif
-                

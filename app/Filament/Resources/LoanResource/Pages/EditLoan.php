@@ -115,10 +115,12 @@ class EditLoan extends EditRecord
         $data['return_file'] = '/storage/loans/Descautela ' . $data['graduation'] . ' - ' . $data['name'] . ' ' . $data['to'] . ' ' . Carbon::now()->format('d.m.Y H\hi') . '.pdf';
 
         // Deletar o PDF antigo
-        $relativePath = str_replace('storage/', '', $record->file);
+        $loanPath = str_replace('storage/', '', $record->file);
+        $returnPath = str_replace('storage/', '', $record->return_file);
 
-        if (Storage::disk('public')->exists($relativePath)) {
-            Storage::disk('public')->delete($relativePath);
+        if (Storage::disk('public')->exists($loanPath)) {
+            Storage::disk('public')->delete($loanPath);
+            Storage::disk('public')->delete($returnPath);
         }
 
         Pdf::loadView('reports.generate-loan-pdf', ['data' => $data, 'config' => $configuration])->save(public_path() . '' . $data['file'] . '')->stream('download.pdf');
