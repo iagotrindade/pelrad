@@ -208,7 +208,7 @@ class MaintenanceResource extends Resource
                     ->description('Esses dados são os preenchidos no ato da criação da manutenção')
                     ->schema([
                         TextEntry::make('destiny')
-                            ->label('Local da Manutenção'),
+                            ->label('Local'),
                         TextEntry::make('created_at')
                             ->label('Data de Criação')
                             ->formatStateUsing(function ($state) {
@@ -221,6 +221,20 @@ class MaintenanceResource extends Resource
                             }),
                         TextEntry::make('status')
                             ->label('Situação'),
+                        TextEntry::make('materials')
+                            ->label('Materiais')
+                            ->formatStateUsing(function ($state) {
+                                // Converte a string separada por vírgulas em um array
+                                $ids = array_map('trim', explode(',', $state));
+
+                                // Busca os materiais cujos IDs estão no array
+                                return Material::whereIn('id', $ids)
+                                    ->get()
+                                    ->map(fn($material) => "{$material->type->name} - {$material->serial_number}")
+                                    ->implode(', ');
+                            }),
+
+
                     ])->columns(4),
                 \Filament\Infolists\Components\Section::make('Guia de Remessa')
                     ->description('Documento gerado pelo S4')
