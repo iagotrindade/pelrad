@@ -8,10 +8,10 @@ use Filament\Widgets\ChartWidget;
 
 class MaterialOverviewChart extends ChartWidget
 {
-    protected static ?string $heading = 'Diponibilidade Material Rádio';
+    protected static ?string $heading = 'Disponibilidade Material Rádio';
     protected static ?int $sort = 3;
     protected int | string | array $columnSpan = 'full';
-    protected static ?string $maxHeight = '450px';
+    protected static ?string $maxHeight = '350px';
 
     protected function getData(): array
     {
