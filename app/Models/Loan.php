@@ -21,6 +21,7 @@ class Loan extends Model
         'contact',
         'materials_info',
         'loan_material_base_data',
+        'loan_personalized_material_data',
         'return_date',
         'file',
         'signed_file',

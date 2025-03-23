@@ -96,6 +96,7 @@ class EditLoan extends EditRecord
     protected function generatePDF($data, $record)
     {
         $data['material_group'] = json_decode($record['loan_material_base_data'], true);
+        $data['personalized_material_group'] = json_decode($record['loan_personalized_material_data'], true);
 
         $groupComponents = collect($data['material_group'][0]['groupComponents'])->map(function ($componentData) {
             return (new Component())->forceFill($componentData)->setRawAttributes($componentData, true);

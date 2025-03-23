@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('contact')->nullable();
             $table->longText('materials_info');
             $table->mediumText('loan_material_base_data');
+            $table->mediumText('loan_personalized_material_data');
             $table->timestamp('return_date');
             $table->string('status');
             $table->string('file');

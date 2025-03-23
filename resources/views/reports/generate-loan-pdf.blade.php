@@ -144,7 +144,10 @@
             <h1>
                 @if (!empty($data['loan_type']) && $data['loan_type'] == 'descautela')
                     Descautela
-                @endif de Material da {{ $config->company }}
+                @else
+                    Cautela
+                @endif
+                 de Material da {{ $config->company }}
             </h1>
             <p>1. Declaro para os fins legais que eu, {{ $data['name'] ?? '' }}, do {{ $data['to'] ?? '' }},
                 {{ !empty($data['loan_type']) && $data['loan_type'] == 'descautela' ? 'devolvi ao' : 'recebi do' }}
@@ -192,7 +195,31 @@
 
                             <td>{{ $group['obs'] ?? '' }}</td>
                         </tr>
+
+                        @php
+                            $finalIteration = $loop->last;
+                        @endphp
                     @endforeach
+
+                    @if(!empty($data['personalized_material_group']))
+                        @foreach ($data['personalized_material_group'] as $key => $group)
+                            <tr>
+                                <td>
+                                    {{ $loop->iteration + $finalIteration }}</td>
+                                <td>
+                                    {{ $group['material'] }}
+                                </td>
+
+                                <td>{{ $group['qtd'] }}</td>
+
+                                <td>
+                                   {{  $group['serial_number'] ?? 'NP' }}
+                                </td>
+
+                                <td>{{ $group['obs'] ?? '' }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>

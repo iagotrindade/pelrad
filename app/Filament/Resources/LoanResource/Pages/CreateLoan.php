@@ -39,6 +39,7 @@ class CreateLoan extends CreateRecord
         $recipients = User::all();
 
         $data['loan_material_base_data'] = json_encode($data['material_group']);
+
         $record = static::getModel()::create($data);
 
         // Atualizar o status de cada material para 'Cautelado'
@@ -103,6 +104,9 @@ class CreateLoan extends CreateRecord
 
         // Converter o array de informações dos materiais para JSON e armazenar em material_info
         $data['materials_info'] = json_encode($materialInfoArray);
+
+        // Adicionar informações do material personalizado ao array
+        $data['loan_personalized_material_data'] = json_encode($data['personalized_material_group']);
 
         $data['from'] = $configuration->organization;
         $data['status'] = 'Aberta';
@@ -207,11 +211,33 @@ class CreateLoan extends CreateRecord
                         ->columns(3)
                         ->collapsible()
                         ->collapsible(),
-
+                    Repeater::make('personalized_material_group')
+                        ->schema([
+                            TextInput::make('material')
+                                ->label('Material')
+                                ->placeholder('Digite o nome do material'),
+                            TextInput::make('qtd')
+                                ->label('Quantidade')
+                                ->type('number')
+                                ->numeric()
+                                ->placeholder('Digite a quantidade de materiais'),
+                            TextInput::make('serial_number')
+                                ->label('Número de Série')
+                                ->placeholder('Digite o número de série'),
+                            TextInput::make('obs')
+                                ->label('Observações')
+                                ->placeholder('S/A')
+                                ->default('S/A'),
+                        ])
+                        ->label('Material Personalizados')
+                        ->columns(3)
+                        ->collapsible()
+                        ->collapsible(),
                     DatePicker::make('return_date')
                         ->required()
                         ->label('Data de retorno')
                         ->live(),
+
                 ]),
 
 
