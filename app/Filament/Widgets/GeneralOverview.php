@@ -59,7 +59,7 @@ class GeneralOverview extends BaseWidget
                 ->url('/users')
                 ->color('primary'),
             Stat::make('Manutenções', Maintenance::all()->count())
-                ->descriptionIcon('heroicon-m-user-group')
+                ->descriptionIcon('heroicon-o-wrench-screwdriver')
                 ->description('Manutenções em andamento '.Maintenance::where('status', 'Em andamento')->count().'')
                 ->url('/maintenances')
                 ->color('primary'), 
