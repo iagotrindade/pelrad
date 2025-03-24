@@ -47,9 +47,7 @@ class MaintenanceResource extends Resource
     protected static ?string $modelLabel = 'Manutenção';
 
     protected static ?string $pluralModelLabel = 'Manutenções';
-
-    protected static ?string $recordTitleAttribute = 'description';
-
+    
     protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
@@ -222,6 +220,10 @@ class MaintenanceResource extends Resource
                             }),
                         TextEntry::make('status')
                             ->label('Situação'),
+                        TextEntry::make('description')
+                            ->label('Observações')
+                            ->extraAttributes(['style' => 'word-break: break-word; overflow-wrap: break-word; white-space: normal;'])
+                            ->columnSpan(4),
                         TextEntry::make('materials')
                             ->label('Materiais')
                             ->columnSpan(4)

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->longText('materials');
             $table->longText('old_info');
-            $table->string('description');
+            $table->mediumText('description');
             $table->string('status');
             $table->string('destiny');
             $table->string('file')->nullable();
