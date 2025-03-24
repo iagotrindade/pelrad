@@ -147,7 +147,7 @@
                 @else
                     Cautela
                 @endif
-                 de Material da {{ $config->company }}
+                de Material da {{ $config->company }}
             </h1>
             <p>1. Declaro para os fins legais que eu, {{ $data['name'] ?? '' }}, do {{ $data['to'] ?? '' }},
                 {{ !empty($data['loan_type']) && $data['loan_type'] == 'descautela' ? 'devolvi ao' : 'recebi do' }}
@@ -169,43 +169,53 @@
                 </thead>
                 <tbody>
                     @foreach ($data['material_group'] as $key => $group)
-                        <tr>
-                            <td>
-                                {{ $loop->iteration }}</td>
-                            <td>
-                                {{ $group['groupName'] }}
-                                @if (!empty($group['groupComponents']))
-                                    (
-                                    @foreach ($group['groupComponents'] as $component)
-                                        @if ($component->show_on_loan)
-                                            {{ $component->loan_name }}{{ $loop->last ? '' : ', ' }}
-                                        @endif
-                                    @endforeach
-                                    )
-                                @endif
-                            </td>
-
-                            <td>{{ $group['qtd'] }}</td>
-
-                            <td>
-                                @foreach ($group['materials'] as $index => $groupMaterial)
-                                    {{ $groupMaterial->serial_number }}{{ $index < count($group['materials']) - 1 ? ' - ' : '' }}
-                                @endforeach
-                            </td>
-
-                            <td>{{ $group['obs'] ?? '' }}</td>
-                        </tr>
-
                         @php
-                            $finalIteration = $loop->last;
+                            $finalIteration = $loop->iteration;
                         @endphp
+
+                        @if ($data['material_group'][0]['materials']->isEmpty())
+                            @continue
+                        @else
+                            <tr>
+                                <td>
+                                    {{ $loop->iteration }}</td>
+                                <td>
+                                    {{ $group['groupName'] }}
+                                    @if (!empty($group['groupComponents']))
+                                        (
+                                        @foreach ($group['groupComponents'] as $component)
+                                            @if ($component->show_on_loan)
+                                                {{ $component->loan_name }}{{ $loop->last ? '' : ', ' }}
+                                            @endif
+                                        @endforeach
+                                        )
+                                    @endif
+                                </td>
+
+                                <td>{{ $group['qtd'] }}</td>
+
+                                <td>
+                                    @foreach ($group['materials'] as $index => $groupMaterial)
+                                        {{ $groupMaterial->serial_number }}{{ $index < count($group['materials']) - 1 ? ' - ' : '' }}
+                                    @endforeach
+                                </td>
+
+                                <td>{{ $group['obs'] ?? '' }}</td>
+                            </tr>
+                        @endif
                     @endforeach
 
-                    @if(!empty($data['personalized_material_group']))
+
+                    @if (!empty($data['personalized_material_group']))
                         @foreach ($data['personalized_material_group'] as $key => $group)
                             <tr>
                                 <td>
-                                    {{ $loop->iteration + $finalIteration }}</td>
+                                    @if ($data['material_group'][0]['materials']->isEmpty())
+                                        {{ $loop->iteration }}
+                                    @else
+                                        {{ $loop->iteration + $finalIteration }}
+                                    @endif
+                                </td>
                                 <td>
                                     {{ $group['material'] }}
                                 </td>
@@ -213,7 +223,7 @@
                                 <td>{{ $group['qtd'] }}</td>
 
                                 <td>
-                                   {{  $group['serial_number'] ?? 'NP' }}
+                                    {{ $group['serial_number'] ?? 'NP' }}
                                 </td>
 
                                 <td>{{ $group['obs'] ?? '' }}</td>

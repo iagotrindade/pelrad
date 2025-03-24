@@ -98,8 +98,13 @@ class CreateLoan extends CreateRecord
             }
             $data['material_group'][$key] = $value;
 
-            $data['material_group'][$key]['groupName'] = $data['material_group'][$key]['materials'][0]->type->name;
-            $data['material_group'][$key]['groupComponents'] = $data['material_group'][$key]['materials'][0]->type->components;
+            if (!empty($data['material_group'][$key]['materials']) && isset($data['material_group'][$key]['materials'][0])) {
+                $data['material_group'][$key]['groupName'] = $data['material_group'][$key]['materials'][0]->type->name;
+                $data['material_group'][$key]['groupComponents'] = $data['material_group'][$key]['materials'][0]->type->components;
+            } else {
+                $data['material_group'][$key]['groupName'] = null;
+                $data['material_group'][$key]['groupComponents'] = null;
+            }
         }
 
         // Converter o array de informações dos materiais para JSON e armazenar em material_info
