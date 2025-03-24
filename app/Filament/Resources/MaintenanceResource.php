@@ -18,6 +18,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -246,6 +247,35 @@ class MaintenanceResource extends Resource
                             ->minHeight('80svh'),
                     ]),
             ]);
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['description', 'materials', 'destiny'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        // Verifica se o campo contém um array válido
+        if (!is_array($record->materials) || empty($record->materials)) {
+            return [
+                'Materiais' => 'Nenhum material encontrado',
+                'Local' => $record->destiny,
+                'Situação' => $record->status,
+            ];
+        }
+
+        // Busca os materiais e formata o resultado
+        $materials = Material::whereIn('id', $record->materials)
+            ->get()
+            ->map(fn($material) => "{$material->type->name} - {$material->serial_number}")
+            ->implode(', ');
+
+        return [
+            'Materiais' => $materials,
+            'Local' => $record->destiny,
+            'Situação' => $record->status,
+        ];
     }
 
     public static function getRelations(): array

@@ -16,6 +16,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
@@ -185,6 +186,13 @@ class NetworkResource extends Resource
             ]);
     }
 
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Frequência' => $record->frequency,
+            'Frequência alterantiva' => $record->alternative_frequency,
+        ];
+    }
 
     public static function getRelations(): array
     {

@@ -20,6 +20,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -40,6 +41,7 @@ use App\Filament\Resources\LoanResource\Pages;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LoanResource\RelationManagers;
+use Carbon\Carbon;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineAction;
 use Rmsramos\Activitylog\Actions\ActivityLogTimelineTableAction;
 use Joaopaulolndev\FilamentPdfViewer\Forms\Components\PdfViewerField;
@@ -281,6 +283,15 @@ class LoanResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['to', 'name', 'idt'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Em nome de' => $record->graduation . ' ' . $record->name,
+            'Criada em' => $record->created_at->format('d M Y'),
+            'Devolução prevista' => Carbon::parse($record->return_date)->format('d M Y'),
+        ];
     }
 
     public static function getRelations(): array

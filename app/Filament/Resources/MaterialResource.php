@@ -15,6 +15,7 @@ use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
@@ -223,7 +224,15 @@ class MaterialResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name', 'serial_number'];
+        return ['name', 'serial_number', 'type.name'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Categoria' => $record->type?->name,
+            'Número de Série' => $record->serial_number,
+        ];
     }
 
     public static function getRelations(): array
