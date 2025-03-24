@@ -24,7 +24,7 @@ class ComplianceData extends BaseWidget
     {
         return $table
             ->query(
-                Compliance::query()
+                Compliance::query()->orderBy('created_at', 'desc')
             )
             ->poll('10s')
             ->heading('Prontos do Pelotão')

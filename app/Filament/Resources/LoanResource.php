@@ -130,9 +130,13 @@ class LoanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(
+                Loan::query()->orderBy('created_at', 'desc')
+            )
             ->columns([
                 TextColumn::make('to')
                     ->searchable()
+                    ->sortable()
                     ->label('OM:'),
                 TextColumn::make('name')
                     ->dateTime()
@@ -141,6 +145,7 @@ class LoanResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('return_date')
                     ->dateTime()

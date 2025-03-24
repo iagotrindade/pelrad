@@ -7,8 +7,6 @@ use App\Models\Configuration;
 use App\Models\Loan;
 use App\Models\User;
 use App\Models\Material;
-use App\Models\Activity;
-use Filament\Infolists\Components\Section;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Spatie\Activitylog\Models\Activity as ModelsActivity;

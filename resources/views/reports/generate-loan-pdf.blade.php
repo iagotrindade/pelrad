@@ -173,7 +173,7 @@
                             $finalIteration = $loop->iteration;
                         @endphp
 
-                        @if ($data['material_group'][0]['materials']->isEmpty())
+                        @if (empty($data['material_group'][0]['materials']))
                             @continue
                         @else
                             <tr>
@@ -205,12 +205,11 @@
                         @endif
                     @endforeach
 
-
                     @if (!empty($data['personalized_material_group']))
                         @foreach ($data['personalized_material_group'] as $key => $group)
                             <tr>
                                 <td>
-                                    @if ($data['material_group'][0]['materials']->isEmpty())
+                                    @if (empty($data['material_group'][0]['materials']))
                                         {{ $loop->iteration }}
                                     @else
                                         {{ $loop->iteration + $finalIteration }}
