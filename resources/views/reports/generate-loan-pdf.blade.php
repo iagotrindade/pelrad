@@ -173,7 +173,8 @@
                             $finalIteration = $loop->iteration;
                         @endphp
 
-                        @if (empty($data['material_group'][0]['materials']))
+
+                        @if (empty($data['material_group'][0]['materials']) || $data['material_group'][0]['materials']->isEmpty())
                             @continue
                         @else
                             <tr>
