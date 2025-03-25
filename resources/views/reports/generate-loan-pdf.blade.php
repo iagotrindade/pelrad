@@ -205,7 +205,7 @@
                         @endif
                     @endforeach
 
-                    @if (!empty($data['personalized_material_group']))
+                    @if ($data['personalized_material_group'][0]['material'] != null)
                         @foreach ($data['personalized_material_group'] as $key => $group)
                             <tr>
                                 <td>
