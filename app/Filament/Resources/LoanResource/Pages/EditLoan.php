@@ -68,9 +68,7 @@ class EditLoan extends EditRecord
             $data = $this->generatePDF($data, $record);
         }
 
-        if($data['status'] == 'Fechada') {
-
-        }
+        
 
         // Atualizar o registro no banco
         $record->update($data);

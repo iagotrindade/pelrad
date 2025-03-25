@@ -182,10 +182,11 @@
                                 <td>
                                     {{ $group['groupName'] }}
                                     @if (!empty($group['groupComponents']))
+         
                                         (
                                         @foreach ($group['groupComponents'] as $component)
-                                            @if ($component->show_on_loan)
-                                                {{ $component->loan_name }}{{ $loop->last ? '' : ', ' }}
+                                            @if ($component['show_on_loan'])
+                                                {{ $component['loan_name'] }}{{ $loop->last ? '' : ', ' }}
                                             @endif
                                         @endforeach
                                         )
@@ -196,7 +197,7 @@
 
                                 <td>
                                     @foreach ($group['materials'] as $index => $groupMaterial)
-                                        {{ $groupMaterial->serial_number }}{{ $index < count($group['materials']) - 1 ? ' - ' : '' }}
+                                        {{ strlen($groupMaterial['serial_number']) > 4 ? substr($groupMaterial['serial_number'], -4) : $groupMaterial['serial_number'] }}{{ $index < count($group['materials']) - 1 ? ' - ' : '' }}
                                     @endforeach
                                 </td>
 
