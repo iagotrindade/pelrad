@@ -97,11 +97,13 @@ class ConsultOracle extends Component
         // Formatar o contexto com os dados para enviar para o Cohere
         
         foreach ($this->iaData['cautelas'] as $key => $loan) {
-            $materialInfo = json_decode($loan['materials_info'], true);
+            $materialInfo = json_decode($loan['materials_info'], true); 
 
-            $this->iaData['cautelas'][$key]['materials_info'] = [
-                'name' => $materialInfo[0]['name'],
-            ];
+            if (isset($materialInfo[0]['id'])) {
+                $this->iaData['cautelas'][$key]['materials_info'] = [
+                    'name' => $materialInfo[0]['name'],
+                ];
+            }
         }
 
         $this->iaData = json_encode($this->iaData);
